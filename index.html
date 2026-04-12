@@ -1,364 +1,812 @@
 <!DOCTYPE html>
-<html lang="fr">
+
+<html lang="fr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Entraîneur">
-<meta name="theme-color" content="#0D0D12">
-<link rel="manifest" href='data:application/manifest+json,{"name":"Entraîneur Partiel","short_name":"Entraîneur","display":"standalone","background_color":"#0D0D12","theme_color":"#0D0D12"}'>
+<meta name="theme-color" id="theme-color-meta" content="#0A0A18">
 <title>Entraîneur Partiel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
 <style>
+/* ── TOKENS ─────────────────────────────────── */
+:root {
+  --bg:#0D0D12;
+  --bg2:#111118;
+  --surf:#16161F;
+  --surf2:#1E1E28;
+  --border:#222230;
+  --border2:#2E2E3E;
+  --t1:#F0EDE8;
+  --t2:#C9A84C;
+  --tm:#7A7A9A;
+  --ts:#44445A;
+  --gold:#C9A84C;
+  --green:#2D9B6E;
+  --red:#E0344A;
+  --blue:#2B7EE0;
+  --violet:#9B5DE5;
+  --grad:linear-gradient(135deg,#C9A84C,#E0B85C);
+  --shadow:0 4px 20px rgba(0,0,0,.5);
+  --shadow2:0 2px 10px rgba(0,0,0,.35);
+  --font:'DM Sans',system-ui,sans-serif;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,20px);
+  --t:.18s ease;
+}
+
+/* ── RESET ───────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:#0D0D12}
-body{font-family:'DM Sans',system-ui,sans-serif;color:#F0EDE8}
-#app{height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;transition:opacity .18s ease,transform .18s ease}
-#app.fading{opacity:0;transform:translateX(8px)}
+html,body{height:100%;background:var(–bg);color:var(–t1);font-family:var(–font);overflow:hidden}
+button{font-family:var(–font);cursor:pointer;border:none;background:none;color:inherit}
 
-/* LAYOUT */
-.screen{min-height:100%;padding-bottom:env(safe-area-inset-bottom,20px)}
+/* ── SCROLL ──────────────────────────────────── */
+#app{height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;transition:opacity var(–t),transform var(–t)}
+#app.fading{opacity:0;transform:translateX(10px)}
+.screen{min-height:100%;padding-bottom:var(–safe-bot)}
+
+/* ── CARDS ───────────────────────────────────── */
+.card{background:var(–surf);border:1px solid var(–border);border-radius:18px}
+.card-sm{background:var(–surf);border:1px solid var(–border);border-radius:14px}
+.card-xs{background:var(–surf2);border:1px solid var(–border);border-radius:10px}
+
+/* ── TYPOGRAPHY ──────────────────────────────── */
+.label{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(–tm)}
+.body{font-size:14px;line-height:1.6;color:var(–t1)}
+
+/* ── LAYOUT ──────────────────────────────────── */
 .pad{padding:0 20px}
-.section-label{font-size:10px;letter-spacing:3px;color:#555570;text-transform:uppercase;margin-bottom:10px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.between{display:flex;justify-content:space-between;align-items:center}
 
-/* CARDS */
-.card{background:#16161F;border-radius:18px;border:1px solid #222230}
-.card-sm{background:#16161F;border-radius:14px;border:1px solid #222230}
+/* ── BUTTONS ─────────────────────────────────── */
+.btn-primary{width:100%;padding:17px;background:var(–grad);color:#0D0D12;border-radius:16px;font-size:15px;font-weight:800;letter-spacing:.3px;box-shadow:0 4px 20px rgba(201,168,76,.3);transition:opacity var(–t),transform .1s}
+.btn-primary:active{transform:scale(.97);opacity:.9}
+.btn-soft{width:100%;padding:15px;background:var(–surf2);border:1px solid var(–border2);border-radius:14px;font-size:14px;font-weight:600;color:var(–t1);transition:background var(–t)}
+.btn-ghost{width:100%;padding:13px;background:transparent;border:1px solid var(–border);border-radius:14px;font-size:13px;color:var(–tm)}
 
-/* BUTTONS */
-.btn{width:100%;padding:17px;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .15s,transform .1s;display:block}
-.btn:active{transform:scale(.97);opacity:.9}
-.btn-ghost{background:none;border:none;color:#555570;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif}
-.btn-soft{background:#1E1E2A;color:#C5C0D8;border:1px solid #222230;border-radius:14px;padding:14px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;width:100%;cursor:pointer}
-.btn-dim{background:transparent;color:#444455;border:1px solid #1A1A28;border-radius:14px;padding:13px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;cursor:pointer}
+/* ── PROGRESS ────────────────────────────────── */
+.progress-track{height:4px;background:var(–surf2);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.xp-track{height:6px;background:var(–surf2);border-radius:6px;overflow:hidden}
+.xp-fill{height:100%;border-radius:6px;background:var(–grad);transition:width 1.2s ease}
 
-/* PROGRESS */
-.progress-wrap{height:4px;background:#1A1A28;border-radius:4px;overflow:hidden}
-.progress-fill{height:100%;border-radius:4px;transition:width .5s ease}
+/* ── STATS ───────────────────────────────────── */
+.stat-card{flex:1;background:var(–surf);border:1px solid var(–border);border-radius:16px;padding:12px 8px;text-align:center}
+.stat-val{font-size:18px;font-weight:800;color:var(–t1);margin-top:3px}
+.stat-lbl{font-size:10px;font-weight:500;color:var(–tm);margin-top:3px;text-transform:uppercase;letter-spacing:1px}
 
-/* XP BAR */
-.xp-wrap{height:6px;background:#222230;border-radius:6px;overflow:hidden;margin-top:12px}
-.xp-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#C9A84C,#E0C060);transition:width 1s ease}
+/* ── SUBJECT CARD ────────────────────────────── */
+.sub-card{width:100%;background:var(–surf);border:1px solid var(–border);border-radius:18px;padding:18px 20px;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:background var(–t);border-left-width:3px}
+.sub-card:active{background:var(–surf2)}
 
-/* OPTION BUTTONS */
-.option{width:100%;background:#16161F;border:1.5px solid #222230;border-radius:14px;padding:13px 14px;text-align:left;cursor:pointer;display:flex;align-items:flex-start;gap:10px;transition:background .18s,border-color .18s;font-family:'DM Sans',sans-serif}
-.option:active{transform:scale(.98)}
-.option.sel{background:#1C1C2E}
-.option.correct{background:#0D2B1E;border-color:#2D9B6E}
-.option.wrong{background:#2B0F14;border-color:#E0344A}
-.option.dimmed{opacity:.45}
-.opt-icon{width:26px;height:26px;border-radius:50%;background:#222230;color:#6B6B8A;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;margin-top:1px;transition:background .18s,color .18s}
-.opt-text{font-size:14px;line-height:1.5;flex:1;color:#C5C0D8;transition:color .18s}
+/* ── OPTION BUTTONS ──────────────────────────── */
+.option{width:100%;background:var(–surf);border:1.5px solid var(–border);border-radius:14px;padding:13px 14px;text-align:left;display:flex;align-items:flex-start;gap:10px;transition:all var(–t)}
+.option:active:not([disabled]){transform:scale(.98)}
+.option.sel{background:var(–surf2);border-color:var(–gold)}
+.option.correct{background:#0D2B1E;border-color:var(–green)}
+.option.wrong{background:#2B0F14;border-color:var(–red)}
+.option.dimmed{opacity:.38}
+.opt-icon{width:26px;height:26px;border-radius:50%;background:var(–surf2);border:1px solid var(–border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;margin-top:1px;color:var(–tm);transition:all var(–t)}
+.option.correct .opt-icon{background:var(–green);border-color:var(–green);color:#fff}
+.option.wrong   .opt-icon{background:var(–red);border-color:var(–red);color:#fff}
+.option.sel     .opt-icon{background:var(–gold);border-color:var(–gold);color:#0D0D12}
+.opt-text{font-size:14px;line-height:1.5;flex:1;color:var(–t1);transition:color var(–t)}
+.option.correct .opt-text{color:#6EE7B7}
+.option.wrong   .opt-text{color:#FCA5A5}
+.option.dimmed  .opt-text{color:var(–ts)}
 
-/* EXPLANATION */
-.expl{border-radius:14px;padding:16px;margin-top:14px;animation:fadeUp .3s ease}
-.expl-ok{background:#0D2B1E;border:1px solid #2D9B6E40}
-.expl-bad{background:#1E1310;border:1px solid #C9A84C40}
-.expl-title{font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:.5px}
-.expl p{font-size:13px;line-height:1.7;color:#C5C0D8}
+/* ── EXPLANATION ─────────────────────────────── */
+.expl{border-radius:14px;padding:16px 18px;margin-top:14px;animation:fadeUp .3s ease}
+.expl.ok {background:#0D2B1E;border:1px solid #2D9B6E}
+.expl.bad{background:#1A1428;border:1px solid var(–gold)}
+.expl-head{font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:7px}
+.expl.ok  .expl-head{color:#6EE7B7}
+.expl.bad .expl-head{color:var(–gold)}
+.expl p{font-size:13px;line-height:1.75;color:#C5C0D8}
 
-/* BADGES */
-.badge-pill{background:#1E1E2A;border:1px solid #333345;border-radius:12px;padding:6px 12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#C5C0D8;margin:3px}
-.theme-tag{border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700}
-.diff-tag{border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700}
+/* ── THEME / DIFF / COUNT CHIPS ─────────────── */
+.theme-chip{background:var(–surf);border:1.5px solid var(–border);border-radius:12px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;width:100%;text-align:left;cursor:pointer;transition:all var(–t)}
+.diff-chip{background:var(–surf);border:1.5px solid var(–border);border-radius:12px;padding:12px;text-align:left;width:100%;cursor:pointer;transition:border-color var(–t)}
+.diff-chip-label{font-size:13px;font-weight:700}
+.diff-chip-sub{font-size:11px;color:var(–tm);margin-top:2px}
+.count-chip{flex:1;padding:11px 6px;border-radius:11px;font-size:15px;font-weight:700;border:1.5px solid var(–border);background:var(–surf);color:var(–tm);cursor:pointer;transition:all var(–t)}
 
-/* QUIZ HEADER */
-.quiz-header{background:#0D0D12;padding:14px 20px 10px;position:sticky;top:0;z-index:10;border-bottom:1px solid #1A1A28;display:flex;justify-content:space-between;align-items:center;padding-top:calc(14px + env(safe-area-inset-top,0px))}
-.quiz-count{font-size:13px;font-weight:700}
-.correct-ct{font-size:13px;font-weight:700;color:#2D9B6E}
-.muted{color:#444455}
+/* ── BADGES & PILLS ──────────────────────────── */
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;border:1px solid}
+.badge-item{display:inline-flex;align-items:center;gap:6px;background:var(–surf);border:1px solid var(–border);border-radius:12px;padding:6px 12px;font-size:12px;color:var(–t1);margin:3px}
 
-/* HEADING */
-h1.hero{font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:800;color:#F0EDE8;line-height:1.2}
-h2.hero{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:800;color:#F0EDE8}
-.serif{font-family:'Playfair Display',Georgia,serif}
+/* ── QUIZ HEADER ─────────────────────────────── */
+.quiz-top{background:var(–bg);padding:calc(14px + var(–safe-top)) 20px 12px;position:sticky;top:0;z-index:20;border-bottom:1px solid var(–border)}
 
-/* SUBJECT CARD */
-.sub-card{border-radius:18px;border:1px solid #222230;background:#16161F;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .15s;border-left-width:4px}
-.sub-card:active{background:#1C1C2E}
+/* ── HISTORY ─────────────────────────────────── */
+.hist-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.hist-box{flex-shrink:0;background:var(–surf);border:1px solid var(–border);border-radius:12px;padding:10px 10px;text-align:center;min-width:52px}
+.hist-box.latest{background:var(–surf2);border-color:var(–gold)}
 
-/* HISTORY ROW */
-.hist-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-.hist-item{flex-shrink:0;border-radius:12px;padding:10px 10px;text-align:center;min-width:52px;border:1px solid #222230;background:#13131A}
-.hist-item.latest{background:#1C1C2E}
+/* ── SCORE RING ──────────────────────────────── */
+.score-ring{width:140px;height:140px;margin:0 auto 16px;position:relative}
+.score-ring canvas{position:absolute;top:0;left:0}
+.score-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-pct{font-size:34px;font-weight:800;color:var(–t1);line-height:1}
+.score-lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-top:2px;color:var(–tm)}
 
-/* COMING SOON */
-.soon-card{border-radius:18px;border:1px solid #1E1E28;border-left:4px solid #2A2A3E;background:#12121A;padding:18px 20px;opacity:.5}
+/* ── MODE BUTTON ─────────────────────────────── */
+.mode-btn{padding:9px 14px;border-radius:12px;background:var(–surf);border:1px solid var(–border);font-size:14px;cursor:pointer;transition:background var(–t)}
 
+/* ── ANIMATIONS ──────────────────────────────── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-
-/* STATS MINI */
-.stats-row{display:flex;gap:8px}
-.stat-box{flex:1;background:#16161F;border:1px solid #222230;border-radius:14px;padding:10px 6px;text-align:center}
-.stat-val{font-size:17px;font-weight:700;color:#F0EDE8;margin-top:2px}
-.stat-lbl{font-size:10px;color:#555570;margin-top:2px}
-
-/* THEME TOGGLE */
-.theme-toggle{padding:12px 14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-width:1.5px;border-style:solid}
-.diff-btn{padding:11px;background:#13131A;border-radius:12px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;border-width:1.5px;border-style:solid;transition:border-color .15s}
-.diff-btn-label{font-size:13px;font-weight:700}
-.diff-btn-sub{font-size:11px;color:#4A4A6A;margin-top:2px}
-.count-btn{flex:1;padding:11px 6px;border-radius:11px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;border:1.5px solid;transition:all .15s}
-
-/* RESULT */
-.result-hero{padding:40px 20px 28px;text-align:center}
-.result-pct{font-size:52px;font-weight:800;font-family:'Playfair Display',serif;color:#F0EDE8}
-.result-grade{display:inline-block;border-radius:20px;padding:6px 22px;font-size:14px;font-weight:700;color:white;margin-top:10px}
-.xp-earned{margin-top:14px;background:#C9A84C22;border-radius:16px;padding:12px 20px;display:inline-flex;align-items:center;gap:8px;border:1px solid #C9A84C40;color:#C9A84C;font-weight:700;font-size:15px}
+@keyframes scaleIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 </style>
+
 </head>
 <body>
 <div id="app"></div>
+
 <script>
-// ═══════════════════════════════════════════
-// QUESTIONS
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// QUESTION BANKS — Questions reformulées
+// ═══════════════════════════════════════════════
 const ENT_Q=[
-  {id:1,t:"ei",d:"f",q:"Quel principe fondamental la loi du 14 février 2022 a-t-elle instauré pour l'entreprise individuelle ?",o:["Obligation d'un capital social minimum","Séparation du patrimoine professionnel et personnel","Imposition obligatoire à l'IS","Publication annuelle des comptes"],a:1,e:"La loi du 14/02/2022 instaure la séparation du patrimoine pro et perso, supprime l'EIRL et ouvre l'option IS."},
-  {id:2,t:"ei",d:"f",q:"Dans quelle catégorie fiscale sont imposés les bénéfices d'une activité libérale en EI ?",o:["BIC","BA","BNC","Traitements et salaires"],a:2,e:"BNC = Bénéfices Non Commerciaux pour les activités libérales. BIC pour le commercial/artisanal, BA pour l'agricole."},
-  {id:3,t:"ei",d:"f",q:"L'entrepreneur individuel est-il obligé de publier ses comptes annuels ?",o:["Oui, chaque année","Non, pas de publication obligatoire","Oui, si CA > 100 000 €","Oui, mais uniquement le bilan"],a:1,e:"L'EI n'a pas l'obligation de publier ses comptes annuels, contrairement aux sociétés."},
-  {id:4,t:"ei",d:"f",q:"À quel régime social est affilié l'entrepreneur individuel ?",o:["Régime général des salariés","Régime des artistes-auteurs","SSI – Sécurité Sociale des Indépendants (TNS)","MSA"],a:2,e:"L'entrepreneur individuel relève du régime TNS (Travailleurs Non-Salariés) géré par la SSI."},
-  {id:5,t:"ei",d:"m",q:"Selon le barème IR 2026, quel taux s'applique entre 29 580 € et 84 577 € (1 part) ?",o:["11 %","20 %","30 %","41 %"],a:2,e:"Barème 2026 : 0% < 11 600€ / 11% de 11 601 à 29 579€ / 30% de 29 580 à 84 577€ / 41% de 84 578 à 181 917€ / 45% au-delà."},
-  {id:6,t:"ei",d:"m",q:"Un couple sans enfant a un revenu net imposable de 63 000 €. Combien de parts fiscales ?",o:["1 part","1,5 part","2 parts","3 parts"],a:2,e:"Un couple marié ou pacsé sans enfant dispose de 2 parts (1 par personne)."},
-  {id:7,t:"ei",d:"m",q:"Comment est imposé le bénéfice d'une entreprise individuelle ?",o:["Au niveau de l'entreprise séparément","Directement dans la déclaration de revenus de l'entrepreneur","Lors du versement de dividendes","Seulement si bénéfice > 10 000 €"],a:1,e:"L'EI n'a pas de personnalité morale. Le résultat est intégré directement à la déclaration IR de l'entrepreneur."},
-  {id:8,t:"ei",d:"m",q:"Combien de parts représente un foyer : couple avec 3 enfants ?",o:["3 parts","3,5 parts","4 parts","5 parts"],a:2,e:"Couple = 2 parts + 1er enfant = ½ + 2e enfant = ½ + 3e enfant = 1 → total = 4 parts."},
-  {id:9,t:"ei",d:"h",q:"Déficit de 10 000 €, conjoint perçoit 5 000 € de salaires. Revenu imposable du foyer ?",o:["15 000 €","10 000 €","0 € avec reliquat de 5 000 € reportable 6 ans","5 000 €"],a:2,e:"Le déficit (10 000€) s'impute sur le revenu global (5 000€). Revenu = 0. Reliquat de 5 000€ reportable sur N+1 à N+6."},
-  {id:10,t:"ei",d:"h",q:"Les cotisations sociales TNS représentent quelle part du bénéfice ?",o:["Le CA","35 à 49 % du bénéfice avant impôt","Le bénéfice après impôt","Un forfait fixe"],a:1,e:"Les cotisations TNS = 35 à 49 % du bénéfice avant impôt. Des cotisations minimales sont dues même sans bénéfice."},
-  {id:11,t:"ei",d:"h",q:"Excédent de déficit non absorbé par les revenus du foyer : que se passe-t-il ?",o:["Définitivement perdu","Reportable sur bénéfices 3 ans","Reportable sur revenu global des 6 années suivantes (N+1 à N+6)","Génère un crédit d'impôt"],a:2,e:"L'excédent de déficit peut être imputé sur le revenu global des 6 années suivantes (N+1 à N+6)."},
-  {id:12,t:"ei",d:"f",q:"L'EI possède-t-elle une personnalité morale ?",o:["Oui, depuis 2022","Non, jamais","Oui, si capital > 1 000 €","Oui, après immatriculation"],a:1,e:"L'EI n'a jamais de personnalité morale. Seules les sociétés (SAS, SARL…) en ont une après immatriculation."},
-  {id:13,t:"me",d:"f",q:"Seuil de CA annuel pour une micro-entreprise de prestations de services en 2026 ?",o:["77 700 €","83 600 €","188 700 €","203 100 €"],a:1,e:"Depuis le 1er janvier 2026 : 83 600 €/an pour les prestations de services et 203 100 €/an pour l'achat-revente."},
-  {id:14,t:"me",d:"f",q:"Abattement forfaitaire pour un micro-entrepreneur exerçant une activité libérale (BNC) ?",o:["71 %","50 %","34 %","25 %"],a:2,e:"Abattements : 71 % achat-revente, 50 % prestations BIC, 34 % activités libérales BNC."},
-  {id:15,t:"me",d:"f",q:"La déclaration de CA est-elle obligatoire si celui-ci est nul ?",o:["Non, inutile","Oui, toujours, sous peine de 52 € de pénalité","Oui, mais sans pénalité","Non, si inactif"],a:1,e:"La déclaration est toujours obligatoire. Pénalité de 52 € par déclaration manquante, même pour un CA de 0 €."},
-  {id:16,t:"me",d:"f",q:"Mention obligatoire sur factures d'un micro-entrepreneur soumis à la franchise TVA ?",o:["TVA récupérée à 20 %","TVA non applicable – Article 293 B du CGI","Exonéré de TVA – statut micro","TVA à régler par le client"],a:1,e:'La mention "TVA non applicable – Article 293 B du CGI" est obligatoire. Le micro-entrepreneur ne facture ni ne récupère la TVA.'},
-  {id:17,t:"me",d:"f",q:"Un micro-entrepreneur peut-il avoir deux micro-entreprises ?",o:["Oui, sans limite","Oui, max 2","Non, une seule par personne","Oui, si activités différentes"],a:2,e:"Une seule micro-entreprise par personne. Plusieurs activités peuvent coexister au sein de la même micro-entreprise."},
-  {id:18,t:"me",d:"m",q:"Activité de conseil démarrée le 1er juillet 2026. Plafond de CA pour la première année ?",o:["83 600 €","41 800 €","77 700 €","101 550 €"],a:1,e:"Le seuil est proratisé : 6 mois sur 12 → 83 600 € ÷ 2 = 41 800 € pour les prestations de services."},
-  {id:19,t:"me",d:"m",q:"Taux de cotisations sociales pour des prestations BIC (commerciales/artisanales) en 2025 ?",o:["12,3 %","21,2 %","24,6 %","23,2 %"],a:1,e:"Taux 2025 : 12,3 % achat-revente ; 21,2 % prestations BIC ; 24,6 % BNC libéraux ; 23,2 % libéraux réglementés CIPAV."},
-  {id:20,t:"me",d:"m",q:"Seuil de base de la franchise TVA pour une activité commerciale ?",o:["83 600 €","77 700 €","85 000 €","93 500 €"],a:2,e:"Seuils TVA base : 85 000 € commercial, 37 500 € services. À distinguer des seuils micro-entreprise."},
-  {id:21,t:"me",d:"m",q:"Taux du prélèvement libératoire IR pour les activités d'achat-revente ?",o:["2,2 %","1,7 %","1 %","0,5 %"],a:2,e:"Prélèvement libératoire : 1 % achat-revente, 1,7 % prestations artisanales/commerciales, 2,2 % autres BNC."},
-  {id:22,t:"me",d:"m",q:"Depuis quand le compte bancaire dédié est-il obligatoire pour un micro-entrepreneur ?",o:["Dès la création","Dès le 1er euro","Si CA > 10 000 € pendant 2 années consécutives","Si CA dépasse le seuil TVA"],a:2,e:"Loi PACTE du 22/05/2019 : compte bancaire dédié obligatoire si CA > 10 000 € pendant 2 années consécutives."},
-  {id:23,t:"me",d:"m",q:"Seuil majoré de franchise TVA pour les prestations de services ?",o:["37 500 €","41 250 €","83 600 €","85 000 €"],a:1,e:"Seuils TVA majorés : 93 500 € commercial, 41 250 € services. Au-delà du seuil majoré, TVA dès le 1er jour du mois."},
-  {id:24,t:"me",d:"h",q:"CA commercial : 82 000 € en 2024, puis 90 500 € en 2025. Perte de franchise TVA en 2025 ?",o:["Oui, il dépasse 85 000 €","Non, car 2024 < 85 000 € ET 2025 < 93 500 €","Oui, dès janvier 2025","Non, car micro-entrepreneur"],a:1,e:"Franchise maintenue si : CA N-1 < seuil de base (82 000 < 85 000 ✓) ET CA N < seuil majoré (90 500 < 93 500 ✓)."},
-  {id:25,t:"me",d:"h",q:"Condition de revenu pour opter pour le prélèvement libératoire de l'IR ?",o:["CA < 83 600 €","RFR ≤ 28 797 € par part","Bénéfice net < 20 000 €","Aucune condition"],a:1,e:"Le RFR du foyer ne doit pas dépasser 28 797 € par part de quotient familial pour pouvoir opter."},
-  {id:26,t:"me",d:"h",q:"60 000 € de ventes de marchandises avec prélèvement libératoire. IR dû ?",o:["60 000 × 34 % = 20 400 €","60 000 × 1 % = 600 €","60 000 × 71 % × barème","60 000 × 1,7 % = 1 020 €"],a:1,e:"Pour l'achat-revente avec prélèvement libératoire : taux de 1 % du CA → 60 000 × 1 % = 600 €."},
-  {id:27,t:"me",d:"h",q:"Parmi ces activités, laquelle est exclue du régime micro-entreprise ?",o:["Graphiste freelance","Développeur web","Expert-comptable libéral","Photographe freelance"],a:2,e:"Les professions libérales réglementées hors CIPAV sont exclues : avocat, médecin, expert-comptable."},
-  {id:28,t:"me",d:"m",q:"Seuil CA 2026 pour l'achat-revente en micro-entreprise ?",o:["188 700 €","203 100 €","77 700 €","83 600 €"],a:1,e:"Seuils 2026-2028 : 203 100 €/an pour les activités d'achat-revente, vente à consommer sur place ou hébergement."},
-  {id:29,t:"me",d:"m",q:"Réduction de cotisations sociales via l'ACRE la première année ?",o:["10 %","25 %","50 %","100 %"],a:1,e:"L'ACRE permet une exonération partielle de 25 % des cotisations sociales pendant la première année, sous conditions."},
-  {id:30,t:"me",d:"f",q:"Le régime micro-entrepreneur est-il ouvert aux étudiants ?",o:["Non","Oui, explicitement ouvert aux étudiants","Oui, pour activités artistiques uniquement","Non, il faut avoir 18 ans et ne plus étudier"],a:1,e:"Le régime micro-entrepreneur est explicitement ouvert aux étudiants qui poursuivent leurs études."},
-  {id:31,t:"aa",d:"f",q:"À quel organisme l'artiste-auteur s'affilie-t-il pour sa sécurité sociale ?",o:["URSSAF (TNS)","AGESSA et Maison des Artistes","Pôle Emploi","MSA"],a:1,e:"L'artiste-auteur s'affilie à l'AGESSA (auteurs) et à la Maison des Artistes (arts plastiques). Régime rattaché au régime général."},
-  {id:32,t:"aa",d:"f",q:"L'artiste-auteur a-t-il accès aux allocations chômage ?",o:["Oui, comme tout travailleur","Non, ce régime n'y donne pas droit","Oui, via les intermittents","Oui, après 2 ans"],a:1,e:"Le régime artiste-auteur est rattaché au régime général pour la maladie, mais PAS accès au chômage ni aux AT des salariés."},
-  {id:33,t:"aa",d:"f",q:"Quelle activité relève du régime des artistes-auteurs ?",o:["Mise à jour d'un site web","Création d'un jeu vidéo original","Dessin industriel et plans","Webmastering et admin de site"],a:1,e:"Un jeu vidéo original constitue une oeuvre multimédia créative. Maintenance, plans techniques et webmastering sont exclus."},
-  {id:34,t:"aa",d:"f",q:"Abattement en régime micro-BNC pour un artiste-auteur ?",o:["71 %","50 %","34 %","15 %"],a:2,e:"En micro-BNC, l'abattement forfaitaire est de 34 % sur les recettes déclarées."},
-  {id:35,t:"aa",d:"m",q:"À partir de quel seuil de CA l'artiste-auteur est-il obligatoirement en déclaration contrôlée ?",o:["83 600 €","77 700 €","37 500 €","100 000 €"],a:1,e:"Si CA < 77 700 € : choix entre micro-BNC et déclaration contrôlée. Au-dessus : déclaration contrôlée obligatoire."},
-  {id:36,t:"aa",d:"m",q:"Assiette sociale micro-BNC pour un artiste déclarant 10 000 € ?",o:["10 000 €","6 600 €","7 590 €","8 500 €"],a:2,e:"Assiette micro-BNC = recettes × (1 - 34 %) × 1,15 → 10 000 × 0,66 = 6 600 € × 1,15 = 7 590 €."},
-  {id:37,t:"aa",d:"m",q:"Mois de paiement des cotisations sociales en BNC (déclaration contrôlée) ?",o:["Mensuellement","15 jan, 15 avr, 15 juil, 15 oct","Semestriellement","Une fois en mai"],a:1,e:"Cotisations versées trimestriellement : 15 janvier, 15 avril, 15 juillet et 15 octobre."},
-  {id:38,t:"aa",d:"m",q:"Plafond annuel des activités accessoires relevant du régime artiste-auteur en 2024 ?",o:["5 000 €","10 000 €","13 980 €","20 000 €"],a:2,e:"En 2024, les revenus des activités accessoires (cours, ateliers…) ne doivent pas dépasser 13 980 € par an."},
-  {id:39,t:"aa",d:"h",q:"Taux global des cotisations sociales d'un artiste-auteur ?",o:["21,2 %","24,6 %","16,2 %","35 %"],a:2,e:"Taux total 16,2 % : SS 0,40 %, retraite plafonnée 6,90 %, CSG 9,20 %, CRDS 0,50 %, CFP 0,35 %."},
-  {id:40,t:"aa",d:"h",q:"Un salarié crée une oeuvre dans le cadre de son contrat : peut-il bénéficier du régime artiste-auteur ?",o:["Oui, automatiquement","Oui, s'il négocie une clause","Non, les salariés créant dans le cadre du travail en sont exclus","Oui, si l'oeuvre est originale"],a:2,e:"Les auteurs salariés créant dans le cadre de leur travail sont exclus du régime artiste-auteur."},
-  {id:41,t:"aa",d:"h",q:"Catégorie fiscale par défaut des revenus d'un artiste-auteur ?",o:["Traitements et salaires","BIC","BNC","BA"],a:2,e:"Les revenus relèvent des BNC par défaut. Ceux déclarés par tiers (éditeurs, SACEM…) peuvent être en T&S."},
-  {id:42,t:"aa",d:"m",q:"Taux de CSG applicable aux revenus des artistes-auteurs ?",o:["7,5 %","9,2 %","6,8 %","17,2 %"],a:1,e:"La CSG est de 9,20 % dont 6,80 % sont déductibles fiscalement. Elle fait partie des 16,2 % de cotisations totales."},
-  {id:43,t:"sc",d:"f",q:"Quel acte juridique donne naissance à une société et fixe ses règles ?",o:["Le procès-verbal d'AG","Les statuts","Le Kbis","La déclaration fiscale initiale"],a:1,e:"Les statuts créent la société. Ils fixent forme, capital, durée, objet, direction... L'immatriculation au RCS confère la personnalité morale."},
-  {id:44,t:"sc",d:"f",q:"Taux normal de l'impôt sur les sociétés (IS) ?",o:["15 %","20 %","25 %","33,33 %"],a:2,e:"IS taux normal = 25 %. Taux réduit 15 % pour bénéfice < 42 500 € sous conditions (dont libération totale du capital)."},
-  {id:45,t:"sc",d:"f",q:"Associé qui apporte ses compétences et savoir-faire : quel type d'apport ?",o:["Numéraire","Nature","Industrie","Mixte"],a:2,e:"Apport en industrie = compétences, savoir-faire, travail, notoriété. Ne constitue PAS le capital social, non transmissible."},
-  {id:46,t:"sc",d:"f",q:"Différence principale de flexibilité entre SAS et SARL ?",o:["SAS a un capital minimum plus élevé","SAS réservée aux activités artistiques","SAS : grande liberté statutaire ; SARL : encadrée par le Code de commerce","SARL peut avoir des associés personnes morales"],a:2,e:"La SAS est très flexible (statuts libres, droits de vote différenciés...). La SARL est plus rigide car encadrée par le Code de commerce."},
-  {id:47,t:"sc",d:"f",q:"Quel document prouve l'immatriculation d'une société au Registre du Commerce ?",o:["Les statuts signés","Le Kbis","L'acte de naissance","La déclaration URSSAF"],a:1,e:"Le Kbis (extrait du RCS) est le document officiel attestant de l'immatriculation et de l'existence légale de la société."},
-  {id:48,t:"sc",d:"m",q:"M. A apporte 10 000 €, Mme B 6 000 € en matériel, M. C ses compétences (8 000 €). Capital social ?",o:["24 000 €","18 000 €","16 000 €","10 000 €"],a:2,e:"Capital = apports numéraire + nature = 10 000 + 6 000 = 16 000 €. L'apport en industrie de M. C ne constitue PAS le capital."},
-  {id:49,t:"sc",d:"m",q:"Un gérant de SARL à 50 % du capital est-il majoritaire ?",o:["Oui, toujours","Non, il faut strictement plus de 50 % (50 % + 1 part)","Oui, si sa rémunération est la plus haute","Non, seulement à partir de 75 %"],a:1,e:"Le gérant est majoritaire s'il détient STRICTEMENT plus de 50 % (plus d'une part). À 50 %, il est égalitaire → régime général."},
-  {id:50,t:"sc",d:"m",q:"Taux réduit d'IS pour les PME sur la fraction de bénéfice < 42 500 € ?",o:["10 %","15 %","20 %","25 %"],a:1,e:"Taux réduit IS = 15 % pour bénéfice < 42 500 €, sous conditions. Taux normal = 25 % au-delà."},
-  {id:51,t:"sc",d:"m",q:"Régime social du président d'une SAS rémunéré ?",o:["TNS","Régime général (assimilé salarié)","Artistes-auteurs","Aucun régime"],a:1,e:"Le président de SAS rémunéré = régime général (assimilé salarié). Gérant majoritaire de SARL = TNS."},
-  {id:52,t:"sc",d:"m",q:"PFU (Flat Tax) applicable aux dividendes depuis le 1er janvier 2026 ?",o:["30 % (12,8 IR + 17,2 prélèvements)","31,4 % (12,8 IR + 18,6 prélèvements)","25 % (IS uniquement)","15 % (taux réduit)"],a:1,e:"Loi de finances 2026 : PFU à 31,4 % = 12,8 % IR + 18,6 % prélèvements sociaux (était 30 % avant 2026)."},
-  {id:53,t:"sc",d:"m",q:"Pourcentage des apports numéraires à libérer à la création en SAS ?",o:["10 %","20 %","50 %","100 %"],a:2,e:"SAS : 50 % des apports numéraires libérés à la création, reste en 5 ans. SARL : seulement 20 % à la création."},
-  {id:54,t:"sc",d:"h",q:"Quand un gérant de SARL est-il majoritaire ?",o:["Seul > 50 % OU avec conjoint + enfants mineurs > 50 %","S'il dirige seul la société","Si salaire > 50 % des charges","Si nommé par la majorité"],a:0,e:"Gérant majoritaire : seul > 50 %, OU avec conjoint + enfants mineurs > 50 %, OU par société interposée > 50 %."},
-  {id:55,t:"sc",d:"h",q:"Fraction des dividendes du gérant majoritaire SARL soumise aux cotisations TNS ?",o:["La totalité","La fraction > 10 % du (capital + compte courant d'associé)","La fraction > 50 % de sa rémunération","Aucune"],a:1,e:"Dividendes excédant 10 % du (capital + compte courant) → cotisations TNS (35-49 %). En dessous → PFU à 31,4 %."},
-  {id:56,t:"sc",d:"h",q:"Dans quelles conditions une SAS à l'IS peut-elle opter pour l'IR ?",o:["Jamais","Sous conditions, max 5 ans","Toujours, sans limite","Si capital < 10 000 €"],a:1,e:"SAS et SARL peuvent opter pour l'IR sous conditions, pour maximum 5 ans. L'EURL est à l'IR par défaut."},
-  {id:57,t:"sc",d:"h",q:"Régime TVA obligatoire si CA de prestations de services > 254 000 € HT ?",o:["Franchise en base","Régime simplifié","Régime réel normal","Régime forfaitaire"],a:2,e:"Régime réel normal obligatoire si CA > 840 000 € (commercial) ou > 254 000 € (services). Déclaration mensuelle de TVA."},
-  {id:58,t:"sc",d:"h",q:"Conditions pour bénéficier de l'abattement de 40 % sur dividendes au barème IR ?",o:["Être gérant majoritaire","Dividendes décidés en AG + société française ou UE","CA < 10 M€ + capital libéré","Aucune condition"],a:1,e:"Abattement 40 % : (1) dividendes décidés en AG ET (2) société française ou siège en UE/pays avec accord fiscal."},
-  {id:59,t:"sc",d:"m",q:"Durée maximale d'une société fixée dans les statuts ?",o:["50 ans","75 ans","99 ans","Illimitée"],a:2,e:"La durée est librement fixée par les associés, dans la limite légale de 99 ans. Elle peut être renouvelée."},
-  {id:60,t:"sc",d:"m",q:"Quand un commissaire aux apports est-il obligatoire pour un apport en nature ?",o:["Toujours","Si apport > 30 000 € OU > 50 % du capital","Si apport > 10 000 €","Jamais"],a:1,e:"Commissaire aux apports obligatoire si apport en nature > 30 000 € OU si valeur totale des apports en nature > 50 % du capital."},
-];
-const DES_Q=[
-  {id:101,t:"da",d:"f",q:"Condition essentielle pour qu'une création graphique soit protégée par le droit d'auteur ?",o:["Avoir été déposée à l'INPI","Être originale (porter l'empreinte de la personnalité de l'auteur)","Avoir été publiée commercialement","Avoir été créée dans le cadre d'un contrat"],a:1,e:"Le droit d'auteur protège automatiquement toute oeuvre originale dès sa création, sans dépôt ni formalité."},
-  {id:102,t:"da",d:"f",q:"À partir de quand une oeuvre est-elle protégée par le droit d'auteur ?",o:["Après dépôt à l'INPI","Après publication commerciale","Dès sa création, sans aucune formalité","Après enregistrement chez un notaire"],a:2,e:"En France, le droit d'auteur naît automatiquement à la création. Aucun dépôt requis, contrairement aux marques ou brevets."},
-  {id:103,t:"da",d:"f",q:"Durée de protection du droit d'auteur en France ?",o:["50 ans après la mort de l'auteur","70 ans après la mort de l'auteur","99 ans à compter de la création","20 ans renouvelables"],a:1,e:"Le droit d'auteur est protégé pendant 70 ans après la mort de l'auteur. Après ce délai, l'oeuvre tombe dans le domaine public."},
-  {id:104,t:"da",d:"f",q:"Qu'est-ce qu'un droit moral d'auteur ?",o:["Le droit de percevoir une rémunération","Le droit inaliénable et perpétuel de l'auteur sur son oeuvre (paternité, intégrité, divulgation, repentir)","Le droit de céder ses droits","Le droit de reproduire en nombre illimité"],a:1,e:"Le droit moral (paternité, intégrité, divulgation, repentir) est inaliénable et perpétuel. Il ne peut jamais être cédé."},
-  {id:105,t:"da",d:"f",q:"Les droits moraux de l'auteur peuvent-ils être cédés ?",o:["Oui, comme tout droit","Oui, à une personne morale uniquement","Non, ils sont inaliénables et perpétuels","Oui, pour max 10 ans"],a:2,e:"Les droits moraux sont inaliénables : ils ne peuvent jamais être cédés, vendus ni abandonnés, même par contrat."},
-  {id:106,t:"da",d:"m",q:"Qu'est-ce que le droit de reproduction d'un auteur ?",o:["Le droit d'obtenir une copie","Le droit exclusif d'autoriser toute fixation matérielle de l'oeuvre (impression, numérique, photo…)","Le droit de représenter l'oeuvre en public","Le droit de modifier l'oeuvre"],a:1,e:"Le droit de reproduction est le droit exclusif d'autoriser toute fixation matérielle de l'oeuvre. Il fait partie des droits patrimoniaux, cessibles."},
-  {id:107,t:"da",d:"m",q:"Un client commande une identité visuelle à un designer freelance. Qui détient les droits d'auteur ?",o:["Le client, car il a payé","Le designer, sauf cession expresse par contrat","Les deux co-auteurs à parts égales","L'INPI"],a:1,e:"Dans une oeuvre de commande, le créateur freelance conserve ses droits d'auteur. Le client ne reçoit que les droits expressément cédés par contrat."},
-  {id:108,t:"da",d:"m",q:"Qu'est-ce qu'une oeuvre de collaboration ?",o:["Oeuvre créée sous la direction d'une entreprise","Oeuvre créée conjointement par plusieurs auteurs, droits gérés en commun","Oeuvre créée pour un client professionnel","Oeuvre financée par plusieurs personnes"],a:1,e:"L'oeuvre de collaboration est créée par plusieurs auteurs ensemble. Droits en indivision. Décisions d'exploitation à l'unanimité."},
-  {id:109,t:"da",d:"m",q:"Exception légale permettant de reproduire un extrait d'oeuvre sans autorisation ?",o:["Si l'oeuvre est sur Internet","Courte citation à titre d'analyse ou de critique, avec mention de la source","Si usage commercial rentable","Si l'oeuvre date de plus de 10 ans"],a:1,e:"L'exception de courte citation permet un extrait à des fins d'analyse, d'enseignement ou de critique, avec mention obligatoire de la source."},
-  {id:110,t:"da",d:"m",q:"Qu'est-ce que le droit de suite pour un artiste ?",o:["Le droit de poursuivre en justice","Le droit de percevoir un % sur les reventes aux enchères de ses oeuvres originales","Le droit de suivre l'utilisation de l'oeuvre","Le droit à une suite de l'oeuvre"],a:1,e:"Le droit de suite = % (0,25 à 4 %) sur le prix de revente aux enchères publiques. Il est inaliénable."},
-  {id:111,t:"da",d:"h",q:"Salarié qui crée un logo pendant son temps de travail : qui détient les droits ?",o:["Automatiquement l'employeur","Au salarié, avec licence implicite employeur","Au salarié, SAUF logiciels ou clause de cession dans le contrat de travail","À l'employeur s'il a donné des instructions précises"],a:2,e:"En France, le salarié reste auteur et titulaire des droits, SAUF pour les logiciels (cédés à l'employeur de plein droit). Pour les autres oeuvres, une clause de cession est nécessaire."},
-  {id:112,t:"da",d:"h",q:"Qu'est-ce qu'une oeuvre collective ?",o:["Toute oeuvre créée à plusieurs","Oeuvre créée sur initiative et sous direction d'une personne (souvent morale) qui la divulgue sous son nom","Oeuvre financée par des fonds publics","Oeuvre créée lors d'un hackathon"],a:1,e:"L'oeuvre collective est créée sous direction d'une personne qui coordonne les contributions et divulgue l'oeuvre sous son nom. Ex : encyclopédies, journaux, sites web d'entreprises."},
-  {id:113,t:"da",d:"h",q:"Un festival utilise l'affiche d'un designer pour un documentaire non prévu au contrat. Quel principe protège l'auteur ?",o:["Le droit de suite","Le principe de spécialité : la cession couvre seulement les usages expressément mentionnés","Le droit de retrait","L'exception de copie privée"],a:1,e:"Le principe de spécialité : toute cession de droits doit préciser les droits, durée, territoire et support. Tout usage non prévu nécessite une nouvelle autorisation."},
-  {id:114,t:"da",d:"m",q:"Qu'est-ce que le domaine public en droit d'auteur ?",o:["Les oeuvres appartenant à l'État","Les oeuvres librement utilisables car protection expirée (70 ans après mort de l'auteur)","Les oeuvres publiées gratuitement","Les oeuvres non déposées à l'INPI"],a:1,e:"Une oeuvre tombe dans le domaine public 70 ans après la mort de l'auteur. Attention : les droits moraux (paternité, intégrité) demeurent."},
-  {id:115,t:"da",d:"m",q:"L'exception de parodie permet-elle de détourner une oeuvre sans autorisation ?",o:["Non, toute utilisation requiert l'accord de l'auteur","Oui, à condition que la parodie soit clairement identifiable et ne crée pas de confusion","Oui, mais uniquement à des fins non commerciales","Non, sauf accord écrit"],a:1,e:"L'exception de parodie permet un détournement sans autorisation si la parodie est reconnaissable comme telle et ne porte pas atteinte à la réputation de l'auteur."},
-  {id:116,t:"ma",d:"f",q:"Durée de protection d'une marque déposée à l'INPI ?",o:["5 ans renouvelables","10 ans renouvelables indéfiniment","20 ans non renouvelables","70 ans après mort du créateur"],a:1,e:"Marque INPI : 10 ans renouvelables indéfiniment, à condition de payer les redevances et d'exploiter la marque."},
-  {id:117,t:"ma",d:"f",q:"Quelle organisation gère les dépôts de marques en France ?",o:["La Chambre de Commerce","L'INPI","Le greffe du tribunal","La DGCCRF"],a:1,e:"L'INPI gère en France les marques, brevets, dessins et modèles. Pour une protection européenne : EUIPO."},
-  {id:118,t:"ma",d:"f",q:"Un signe purement descriptif du produit peut-il être déposé comme marque ?",o:["Oui, sans restriction","Non, il ne peut constituer une marque valide","Oui, avec un logo","Oui, en langue étrangère"],a:1,e:"Un signe descriptif est refusé à l'enregistrement. Une marque doit être distinctive et ne pas décrire directement le produit."},
-  {id:119,t:"ma",d:"m",q:"Qu'est-ce que la règle de spécialité d'une marque ?",o:["La marque ne protège que dans un pays","La protection ne vaut que pour les classes de produits/services enregistrées","La marque doit être utilisée exactement telle que déposée","La marque ne peut être utilisée que par une entité"],a:1,e:"La règle de spécialité : une marque est protégée uniquement pour les classes déclarées lors du dépôt (45 classes de Nice)."},
-  {id:120,t:"ma",d:"m",q:"Qu'est-ce que la déchéance d'une marque ?",o:["L'expiration à 10 ans","Perte des droits si la marque n'est pas exploitée pendant 5 ans consécutifs","Annulation d'une marque similaire antérieure","Refus lors du dépôt"],a:1,e:"Déchéance : si la marque n'est pas exploitée pendant 5 ans consécutifs sans juste motif, tout concurrent peut en demander la déchéance."},
-  {id:121,t:"ma",d:"m",q:"Comment protéger une marque dans tous les pays de l'UE en une démarche ?",o:["Dépôt INPI avec extension UE","Dépôt d'une marque de l'UE auprès de l'EUIPO","Dépôt dans chaque pays séparément","Dépôt auprès de l'OMPI pour l'Europe"],a:1,e:"La marque de l'UE est déposée auprès de l'EUIPO à Alicante. Protection dans les 27 États membres en un seul dépôt."},
-  {id:122,t:"ma",d:"m",q:"Un designer crée un logo ressemblant à une marque déposée. Quel risque principal ?",o:["Aucun si non identique","Action en contrefaçon ou concurrence déloyale par le titulaire de la marque","Amende administrative INPI","Simple avertissement"],a:1,e:"Un logo similaire à une marque déposée expose à une action en contrefaçon ou concurrence déloyale. D'où l'importance de rechercher les antériorités."},
-  {id:123,t:"ma",d:"h",q:"Différences entre protection par droit d'auteur et droit des marques pour un logo ?",o:["Identiques","DA : automatique, 70 ans post-mortem, pas de dépôt. Marque : dépôt obligatoire, 10 ans renouvelables, protection par secteur","DA : dépôt INPI obligatoire. Marque : automatique","DA : 20 ans. Marque : illimitée sans dépôt"],a:1,e:"Droit d'auteur : automatique, 70 ans post-mortem, pas de dépôt. Marque : dépôt INPI obligatoire, 10 ans, protection par classes. Un logo peut cumuler les deux."},
-  {id:124,t:"ma",d:"h",q:"Qu'est-ce qu'une marque notoire et quelle protection spéciale lui est accordée ?",o:["Une marque très ancienne","Une marque connue d'une large fraction du public, protégée même hors de ses classes d'enregistrement","Une marque déposée dans plus de 50 pays","Une marque approuvée par l'État"],a:1,e:"La marque notoire (Apple, Nike…) bénéficie d'une protection étendue hors de ses classes d'enregistrement."},
-  {id:125,t:"dm",d:"f",q:"Qu'est-ce qu'un dessin ou modèle au sens juridique ?",o:["Un plan technique de bâtiment","L'apparence esthétique d'un produit (lignes, couleurs, formes, texture, ornements)","Une illustration publiée","Un logotype d'entreprise"],a:1,e:"Un dessin ou modèle protège l'apparence visuelle d'un produit : forme, lignes, couleurs, texture, ornements. Ex : meuble, emballage, textile."},
-  {id:126,t:"dm",d:"f",q:"Durée maximale de protection d'un dessin ou modèle déposé ?",o:["10 ans","20 ans","25 ans","70 ans"],a:2,e:"Protection de 5 ans renouvelables jusqu'à 25 ans maximum. À l'expiration, le design entre dans le domaine public."},
-  {id:127,t:"dm",d:"m",q:"Deux conditions pour qu'un dessin ou modèle soit protégeable par dépôt ?",o:["Originalité et ancienneté","Nouveauté et caractère propre (impression visuelle globale différente)","Dépôt et paiement de redevances","Utilisation commerciale et publication"],a:1,e:"Conditions : (1) Nouveauté (aucun design identique antérieurement divulgué) et (2) Caractère propre (impression visuelle différente des designs antérieurs)."},
-  {id:128,t:"dm",d:"m",q:"Le design communautaire non enregistré offre-t-il une protection ?",o:["Non, seul le dépôt INPI protège","Oui, 3 ans de protection automatique dès la première divulgation en Europe","Oui, 5 ans automatiquement","Non, sans dépôt aucune protection"],a:1,e:"Le DMCNE (Dessin ou Modèle Communautaire Non Enregistré) offre 3 ans de protection automatique dès la première divulgation publique en UE."},
-  {id:129,t:"dm",d:"m",q:"Présentation d'un concept à un salon avant dépôt : peut-on encore déposer le design ?",o:["Non, la divulgation détruit la nouveauté","Oui, les salons pro sont confidentiels","Oui, délai de grâce de 12 mois après divulgation pour déposer","Oui, si aucune photo n'a été prise"],a:2,e:"Délai de grâce européen de 12 mois : une divulgation par l'auteur dans l'année précédant le dépôt ne détruit pas la nouveauté."},
-  {id:130,t:"dm",d:"h",q:"Différence entre protection par droit d'auteur et dessin/modèle pour un objet de design ?",o:["Identiques","DA : automatique, originalité, 70 ans post-mortem. DM : dépôt, nouveauté + caractère propre, 25 ans max. Peuvent se cumuler.","DA : 25 ans. DM : 70 ans","DA : pour 2D uniquement. DM : pour 3D uniquement"],a:1,e:"Un objet de design peut cumuler DA (original, automatique, 70 ans) ET dessin/modèle (nouveau + caractère propre, dépôt, 25 ans). Théorie de l'unité de l'art en France."},
-  {id:131,t:"ct",d:"f",q:"Qu'est-ce qu'une cession de droits d'auteur ?",o:["Un emprunt temporaire des droits","Un transfert définitif et contractuel des droits patrimoniaux vers un cessionnaire","Un partage des droits","Une autorisation verbale"],a:1,e:"La cession de droits est un transfert DÉFINITIF des droits patrimoniaux de l'auteur vers un tiers, contre rémunération. Obligatoirement écrite."},
-  {id:132,t:"ct",d:"f",q:"Qu'est-ce qu'une licence d'utilisation ?",o:["Un certificat officiel d'exercice","Une autorisation d'utiliser une oeuvre selon des conditions définies, sans transfert de propriété","Un contrat de travail créatif","Un document INPI attestant d'un dépôt"],a:1,e:"La licence autorise l'utilisation de l'oeuvre selon des conditions précises (durée, territoire, supports, usage). L'auteur reste propriétaire de ses droits."},
-  {id:133,t:"ct",d:"m",q:"La cession de droits d'auteur doit-elle être écrite ?",o:["Non, un accord oral suffit","Oui, écrite et précisant : droits cédés, durée, territoire, mode d'exploitation et rémunération","Non, sauf montants > 1 500 €","Oui, uniquement pour les cessions totales"],a:1,e:"La cession doit OBLIGATOIREMENT être écrite (art. L131-3 CPI) et préciser : droits cédés, durée, territoire, mode d'exploitation et rémunération."},
-  {id:134,t:"ct",d:"m",q:"Principe de spécialité en matière de cession de droits ?",o:["Chaque contrat ne couvre qu'un type de création","La cession est limitée aux droits et usages expressément mentionnés","Le contrat ne vaut que pour une seule utilisation","La cession ne vaut que dans un pays"],a:1,e:"Principe de spécialité (art. L131-3 CPI) : les droits non expressément cédés restent chez l'auteur. Les contrats vagues s'interprètent en faveur de l'auteur."},
-  {id:135,t:"ct",d:"m",q:"Sans contrat de cession, le client peut-il utiliser une affiche pour un autre projet ?",o:["Oui, car il a payé le designer","Non, seul l'usage convenu est autorisé","Oui, si usage similaire","Oui, la commande implique une cession complète"],a:1,e:"Sans cession de droits, le client n'a qu'une licence implicite pour l'usage convenu. Tout autre usage est non autorisé."},
-  {id:136,t:"ct",d:"h",q:"Dans un contrat de commande, le client acquiert-il automatiquement tous les droits d'auteur ?",o:["Oui, le financement transfère les droits","Non, l'auteur freelance conserve ses droits sauf cession expresse. Paiement ≠ transfert de droits.","Oui, si la commande > 1 000 €","Cela dépend de la nature de l'oeuvre"],a:1,e:"Dans un contrat de commande, l'auteur (freelance) CONSERVE ses droits d'auteur. Paiement de la commande ≠ cession de droits. Principe fondamental du droit français."},
-  {id:137,t:"ct",d:"h",q:"Que doit préciser un contrat de cession selon le Code de la Propriété Intellectuelle ?",o:["Uniquement le prix","Les droits cédés, la durée, le territoire, la destination et la rémunération","Nom de l'auteur et date de création","Le numéro SIRET des deux parties"],a:1,e:"Art. L131-3 CPI : la cession doit préciser les droits cédés, la durée, le territoire, la destination (usage prévu) et la rémunération. Toute mention absente = droit non cédé."},
-  {id:138,t:"cf",d:"f",q:"Qu'est-ce que la contrefaçon en propriété intellectuelle ?",o:["Imitation d'un produit de luxe","Toute atteinte aux droits de PI : reproduction ou utilisation non autorisée d'une oeuvre, marque, brevet ou dessin protégé","Vente de produits défectueux","Copie d'un style artistique"],a:1,e:"La contrefaçon = toute violation d'un droit de PI : copie d'oeuvre (DA), imitation de marque, usage non autorisé d'un brevet ou dessin/modèle."},
-  {id:139,t:"cf",d:"m",q:"Sanction pénale maximale pour contrefaçon en France ?",o:["1 an et 100 000 € d'amende","3 ans et 300 000 € d'amende","10 ans et 1 M€","5 ans et 500 000 €"],a:1,e:"Contrefaçon : délit pénal puni de 3 ans et 300 000 € (art. L335-2 CPI). Peine aggravée (5 ans, 500 000 €) : bande organisée, Internet, travail dissimulé."},
-  {id:140,t:"cf",d:"m",q:"S'inspirer fortement du style d'un créateur sans copier son oeuvre exacte : est-ce de la contrefaçon ?",o:["Oui, s'inspirer d'un style est toujours contrefaçon","Non, le style n'est pas protégeable ; seul l'emprunt d'éléments originaux spécifiques peut constituer contrefaçon","Oui, si même secteur","Non, liberté artistique totale"],a:1,e:"Le style artistique n'est pas protégé par le droit d'auteur. Seules les oeuvres concrètes originales le sont. S'inspirer = légal. Reproduire des éléments formels originaux = contrefaçon potentielle."},
-  {id:141,t:"cf",d:"m",q:"Comment prouver la date de création d'une oeuvre contre une accusation de plagiat ?",o:["Seul un dépôt à l'INPI fait foi","Par tout moyen : enveloppe Soleau, huissier, plateforme horodatée, e-coffre-fort","Par témoignage de l'auteur","Par la date de publication sur les réseaux sociaux"],a:1,e:"Preuve de date par tout moyen : enveloppe Soleau (INPI), dépôt huissier, société d'auteurs (SACD, SCAM) ou plateformes horodatées."},
-  {id:142,t:"cf",d:"h",q:"Différence entre contrefaçon et plagiat ?",o:["Termes juridiquement identiques","Plagiat = terme moral (appropriation sans citation). Contrefaçon = terme juridique (atteinte à un droit PI). Le plagiat peut constituer une contrefaçon.","Contrefaçon : marques uniquement. Plagiat : littérature uniquement","Plagiat : pénal. Contrefaçon : civil"],a:1,e:"Plagiat = concept moral/académique. Contrefaçon = terme juridique. Le plagiat d'une oeuvre protégée peut constituer une contrefaçon."},
-  {id:143,t:"cf",d:"f",q:"Une image trouvée sur Google Images est-elle libre de droits ?",o:["Oui, tout sur Internet est libre","Non, les images sont protégées par le droit d'auteur sauf mention contraire","Oui, si non filigranée","Oui, pour usage non commercial"],a:1,e:"Les images sur Internet sont protégées dès leur création. Il faut vérifier la licence ou utiliser des banques d'images libres (Creative Commons, Unsplash…)."},
-  {id:144,t:"cf",d:"h",q:"Qu'est-ce qu'une action en saisie-contrefaçon ?",o:["Une procédure pénale d'arrestation","Une procédure civile permettant de faire saisir par huissier les preuves et produits contrefaisants, avant tout procès","Une amende administrative de l'INPI","Un recours douanier uniquement"],a:1,e:"La saisie-contrefaçon : procédure préventive puissante. Le titulaire de droits obtient d'un juge l'autorisation de faire constater par huissier les preuves de contrefaçon avant le procès."},
-  {id:145,t:"da",d:"m",q:"Une photo d'un monument public est-elle protégée par le droit d'auteur ?",o:["Non, les photos amateurs ne sont pas protégées","Oui, si elle présente des choix esthétiques originaux (cadrage, lumière, angle) portant l'empreinte du photographe","Non, les monuments publics sont dans le domaine public","Oui, automatiquement toute photographie"],a:1,e:"Une photo est protégée si elle est originale (choix esthétiques propres à l'auteur). Une simple photo documentaire sans choix créatif ne sera pas forcément protégée."},
-  {id:146,t:"ma",d:"f",q:"Combien de classes existent dans le classement international de Nice pour les marques ?",o:["10 classes","25 classes","45 classes","100 classes"],a:2,e:"Le classement de Nice comprend 45 classes : 34 classes de produits et 11 classes de services."},
-  {id:147,t:"dm",d:"f",q:"Où dépose-t-on un dessin ou modèle pour une protection en France ?",o:["Greffe du tribunal de commerce","À l'INPI","Chambre de Commerce","À la DGCCRF"],a:1,e:"Les dessins et modèles sont déposés à l'INPI pour une protection en France, ou à l'EUIPO pour une protection européenne."},
-  {id:148,t:"ct",d:"h",q:"Qu'est-ce que la rémunération proportionnelle en droit d'auteur ?",o:["Toujours obligatoire sur le CA global","En principe obligatoire pour les cessions, calculée sur les recettes d'exploitation. Forfait possible dans des cas limitativement prévus.","Jamais obligatoire","Obligatoire uniquement pour la publicité"],a:1,e:"Art. L131-4 CPI : la cession doit être rémunérée proportionnellement aux recettes d'exploitation. Le forfait n'est possible que dans des cas limitativement prévus (logiciel, usage difficile à déterminer…)."},
-  {id:149,t:"da",d:"m",q:"Qu'est-ce que le droit de divulgation de l'auteur ?",o:["Le droit de publier sur les réseaux","Le droit exclusif de décider si, quand et comment son oeuvre sera communiquée au public pour la première fois","Le droit d'informer les médias","Le droit de déposer l'oeuvre à l'INPI"],a:1,e:"Le droit de divulgation (droit moral) : l'auteur seul décide si et quand son oeuvre est rendue publique pour la première fois."},
-  {id:150,t:"cf",d:"m",q:"Qu'est-ce que l'exception de copie privée ?",o:["Toute personne peut reproduire une oeuvre pour son usage personnel strictement, sans autorisation","Toute copie entre amis est autorisée","Les entreprises peuvent copier des oeuvres pour usage interne","La copie privée n'existe pas en droit français"],a:0,e:"L'exception de copie privée : toute personne peut reproduire une oeuvre protégée pour son usage personnel et privé. Elle est compensée par la redevance copie privée prélevée sur les supports vierges."},
+  // ENTREPRISE INDIVIDUELLE
+  {id:1,t:"ei",d:"f",
+   q:"La loi du 14 février 2022 a profondément réformé le statut de l'entrepreneur individuel. Parmi les principes suivants, lequel a été instauré par cette réforme comme avancée majeure ?",
+   o:["L'obligation de constituer un capital social minimum de 1 000 €","La séparation automatique du patrimoine professionnel et du patrimoine personnel","L'imposition obligatoire des bénéfices à l'impôt sur les sociétés","La publication annuelle obligatoire des comptes de l'entreprise"],
+   a:1,e:"La loi du 14/02/2022 instaure la séparation automatique du patrimoine pro et perso, supprime l'EIRL devenue inutile, et ouvre une option pour l'IS."},
+
+  {id:2,t:"ei",d:"f",
+   q:"Un graphiste indépendant exerce une activité de conseil en communication visuelle sous forme d'entreprise individuelle. Dans quelle catégorie fiscale ses bénéfices seront-ils imposés ?",
+   o:["BIC – Bénéfices Industriels et Commerciaux","BA – Bénéfices Agricoles","BNC – Bénéfices Non Commerciaux","Traitements et salaires"],
+   a:2,e:"Les activités libérales (conseil, design, professions intellectuelles) relèvent des BNC. Les activités commerciales/artisanales relèvent des BIC, les agricoles des BA."},
+
+  {id:3,t:"ei",d:"f",
+   q:"Contrairement aux sociétés commerciales, l'entrepreneur individuel bénéficie d'obligations allégées en matière de communication financière. Quelle obligation est-il dispensé de respecter ?",
+   o:["Tenir une comptabilité (livre-journal et grand livre)","Publier ses comptes annuels (bilan, compte de résultat)","Établir un bilan et un compte de résultat en fin d'exercice","Transmettre sa déclaration de résultats aux impôts"],
+   a:1,e:"L'EI n'a pas l'obligation de publier ses comptes annuels, contrairement aux sociétés. Elle doit en revanche tenir une comptabilité et établir un bilan en interne."},
+
+  {id:4,t:"ei",d:"f",
+   q:"Un entrepreneur individuel s'inscrit sur le guichet unique. Il sera automatiquement affilié à un régime de protection sociale. Lequel ?",
+   o:["Le régime général des salariés de la Sécurité sociale","Le régime de sécurité sociale des artistes-auteurs (AGESSA)","La Sécurité Sociale des Indépendants (SSI) — régime TNS","La Mutuelle Sociale Agricole (MSA)"],
+   a:2,e:"L'entrepreneur individuel relève obligatoirement du régime TNS (Travailleurs Non-Salariés), géré par la SSI. Les cotisations représentent 35 à 49 % du bénéfice."},
+
+  {id:5,t:"ei",d:"m",
+   q:"Marie est graphiste freelance, célibataire, et réalise un bénéfice imposable de 45 000 € en 2026. Selon le barème progressif de l'IR en vigueur, à quel taux marginal est soumise la fraction de son revenu comprise entre 29 580 € et 84 577 € ?",
+   o:["11 %","20 %","30 %","41 %"],
+   a:2,e:"Barème IR 2026 : 0 % < 11 600 € / 11 % de 11 601 à 29 579 € / 30 % de 29 580 à 84 577 € / 41 % de 84 578 à 181 917 € / 45 % au-delà."},
+
+  {id:6,t:"ei",d:"m",
+   q:"Julien et Sophie sont mariés, sans enfant, et déposent une déclaration commune avec un revenu net imposable total de 63 000 €. Combien de parts de quotient familial représente leur foyer fiscal ?",
+   o:["1 part","1,5 part","2 parts","3 parts"],
+   a:2,e:"Un couple marié ou pacsé sans enfant dispose de 2 parts de quotient familial — 1 part par personne. Le quotient familial divise le revenu imposable par le nombre de parts."},
+
+  {id:7,t:"ei",d:"m",
+   q:"Thomas exploite une entreprise individuelle rentable. Il se demande comment son bénéfice sera intégré dans sa situation fiscale personnelle. Quelle est la règle applicable ?",
+   o:["Il est imposé séparément au niveau de l'entreprise, comme dans une société","Il est intégré directement dans la déclaration annuelle de revenus de l'entrepreneur, soumis au barème progressif de l'IR","Il n'est imposé que lors du versement effectif des bénéfices à titre personnel","Il est exonéré d'IR si inférieur à 10 000 € par an"],
+   a:1,e:"L'EI n'a pas de personnalité morale distincte. Le résultat de l'entreprise est directement intégré à la déclaration de revenus personnelle de l'entrepreneur, soumis au barème progressif de l'IR."},
+
+  {id:8,t:"ei",d:"m",
+   q:"Amélie et Karim sont mariés et ont trois enfants à charge. Combien de parts de quotient familial leur foyer fiscal représente-t-il pour le calcul de l'impôt sur le revenu ?",
+   o:["3 parts","3,5 parts","4 parts","5 parts"],
+   a:2,e:"Couple = 2 parts + 1er enfant = ½ part + 2e enfant = ½ part + 3e enfant = 1 part (à partir du 3e) → total = 4 parts. L'effet fiscal du 3e enfant est donc plus important."},
+
+  {id:9,t:"ei",d:"h",
+   q:"Mme Leroy exploite une EI et réalise un déficit de 10 000 € sur l'exercice. Son conjoint perçoit par ailleurs 5 000 € de salaires nets imposables. Quel est le revenu imposable du foyer fiscal, et que devient l'excédent déficitaire ?",
+   o:["Le déficit est perdu, le revenu imposable est 5 000 €","Le déficit est reportable sur les bénéfices des 3 années suivantes uniquement","Le revenu imposable est 0 €, et l'excédent de 5 000 € est reportable sur le revenu global des 6 années suivantes (N+1 à N+6)","Le revenu imposable est 0 € mais le déficit est définitivement perdu"],
+   a:2,e:"Le déficit (10 000 €) s'impute sur les autres revenus du foyer (5 000 €). Revenu = 0 €. Le reliquat déficitaire de 5 000 € est reportable sur le revenu global des 6 années suivantes (N+1 à N+6 maximum)."},
+
+  {id:10,t:"ei",d:"h",
+   q:"Un entrepreneur individuel soumis au régime TNS s'interroge sur sa protection sociale. Sur quelle base ses cotisations sociales obligatoires sont-elles calculées, et à quel niveau ?",
+   o:["Sur le chiffre d'affaires brut, à un taux fixe de 22 %","Sur le bénéfice avant impôt, entre 35 et 49 % selon les catégories de cotisations","Sur le bénéfice après impôt, à un taux moyen de 25 %","Sur un forfait annuel fixe indépendant des résultats de l'activité"],
+   a:1,e:"Les cotisations TNS sont calculées sur le bénéfice avant impôt, entre 35 et 49 % (maladie, retraite de base, retraite complémentaire, invalidité, formation, CSG/CRDS). Des cotisations minimales sont dues même en l'absence de bénéfice."},
+
+  {id:11,t:"ei",d:"h",
+   q:"Un entrepreneur individuel réalise un déficit qui dépasse l'ensemble des autres revenus de son foyer fiscal. Quelle est la règle de report applicable à cet excédent non imputé ?",
+   o:["Il est définitivement perdu et ne peut être reporté","Il est reportable uniquement sur les bénéfices professionnels des 3 années suivantes","Il est reportable sur le revenu global des 6 années suivantes, de N+1 à N+6","Il génère automatiquement un crédit d'impôt remboursable"],
+   a:2,e:"L'excédent de déficit non absorbé par les autres revenus du foyer peut être imputé sur le revenu global des années N+1 à N+6 (6 années maximum). Au-delà, le droit au report est prescrit."},
+
+  {id:12,t:"ei",d:"f",
+   q:"Une entreprise individuelle dispose-t-elle d'une personnalité morale distincte de celle de son créateur, à l'image d'une société ?",
+   o:["Oui, depuis la réforme de la loi du 14 février 2022","Non, une EI n'a jamais de personnalité morale distincte de celle de l'entrepreneur","Oui, si le capital professionnel dépasse 1 000 €","Oui, dès lors qu'elle est immatriculée sur le guichet unique"],
+   a:1,e:"L'EI n'a jamais de personnalité morale distincte. Seules les sociétés (SAS, SARL, SA…) acquièrent la personnalité morale par leur immatriculation au RCS."},
+
+  // MICRO-ENTREPRISE
+  {id:13,t:"me",d:"f",
+   q:"Vous souhaitez créer une micro-entreprise en 2026 pour exercer une activité de consultant en stratégie digitale, qui est une prestation de services. Quel est le plafond annuel de chiffre d'affaires à ne pas dépasser pour maintenir ce régime ?",
+   o:["77 700 € HT par an","83 600 € HT par an","188 700 € HT par an","203 100 € HT par an"],
+   a:1,e:"Depuis le 1er janvier 2026 (valable jusqu'en 2028) : 83 600 €/an pour les prestations de services, et 203 100 €/an pour les activités d'achat-revente ou les prestations d'hébergement."},
+
+  {id:14,t:"me",d:"f",
+   q:"Un micro-entrepreneur exerce une activité libérale (BNC) et déclare 50 000 € de chiffre d'affaires annuel. Quel abattement forfaitaire s'applique sur ce CA pour déterminer son revenu net imposable ?",
+   o:["71 % du chiffre d'affaires","50 % du chiffre d'affaires","34 % du chiffre d'affaires","25 % du chiffre d'affaires"],
+   a:2,e:"Les abattements forfaitaires représentent toutes les charges de l'entreprise : 71 % pour l'achat-revente/hébergement, 50 % pour les prestations de services BIC, 34 % pour les activités libérales BNC."},
+
+  {id:15,t:"me",d:"f",
+   q:"Un micro-entrepreneur n'a réalisé aucun chiffre d'affaires sur le mois écoulé. Est-il quand même tenu de faire sa déclaration de CA auprès de l'URSSAF, et quelle pénalité s'applique en cas d'oubli ?",
+   o:["Non, il n'est pas nécessaire de déclarer un CA nul","Oui, la déclaration reste obligatoire, sous peine d'une pénalité de 52 € par déclaration manquante ou en retard","Oui, la déclaration est obligatoire mais aucune pénalité n'est prévue pour un CA nul","Non, uniquement en cas d'activité réelle"],
+   a:1,e:"La déclaration de CA est toujours obligatoire, même pour un montant nul. La pénalité est de 52 € par déclaration manquante ou en retard. La déclaration se fait en ligne sur autoentrepreneur.urssaf.fr."},
+
+  {id:16,t:"me",d:"f",
+   q:"Un micro-entrepreneur soumis à la franchise en base de TVA établit une facture pour une prestation à un client professionnel. Quelle mention est légalement obligatoire sur cette facture concernant la TVA ?",
+   o:["\"TVA récupérée sur les achats à 20 %\"","\"TVA non applicable en vertu de l'article 293 B du CGI\"","\"Exonération TVA accordée au statut de micro-entrepreneur\"","\"TVA à la charge du client, réglable directement\""],
+   a:1,e:"La mention \"TVA non applicable – article 293 B du CGI\" est obligatoire sur toutes les factures. Le micro-entrepreneur en franchise ne facture pas, ne déclare pas et ne récupère pas la TVA."},
+
+  {id:17,t:"me",d:"f",
+   q:"Une étudiante en design envisage de créer une deuxième micro-entreprise pour une nouvelle activité, en plus de celle qu'elle possède déjà. Est-ce juridiquement possible ?",
+   o:["Oui, sans limitation du nombre de micro-entreprises possédées","Oui, mais uniquement deux micro-entreprises au maximum","Non, une seule micro-entreprise est autorisée par personne, mais plusieurs activités peuvent y être rattachées","Oui, si les deux activités relèvent de catégories fiscales différentes (BIC et BNC)"],
+   a:2,e:"La loi n'autorise qu'une seule micro-entreprise par personne physique. En revanche, il est possible d'y exercer plusieurs activités différentes, même sans lien entre elles. Il faut simplement déclarer l'adjonction de la nouvelle activité."},
+
+  {id:18,t:"me",d:"m",
+   q:"Léa débute son activité de consultante indépendante (prestation de services) le 1er juillet 2026. Pour cette première demi-année d'activité, quel plafond de chiffre d'affaires proratisé s'applique à elle ?",
+   o:["83 600 €","41 800 €","77 700 €","101 550 €"],
+   a:1,e:"Les seuils de la micro-entreprise sont proratisés selon la durée d'activité. Démarrant le 1er juillet 2026 (6 mois sur 12), Léa dispose d'un plafond de : 83 600 € ÷ 2 = 41 800 € pour son activité de prestation de services."},
+
+  {id:19,t:"me",d:"m",
+   q:"Un micro-entrepreneur exerce une activité de réparation de vélos (prestation de services de nature artisanale, BIC). En 2025, quel est le taux de cotisations sociales applicable à son chiffre d'affaires déclaré ?",
+   o:["12,3 % du CA","21,2 % du CA","24,6 % du CA","23,2 % du CA"],
+   a:1,e:"Taux au 1er janvier 2025 : 12,3 % pour l'achat-revente et l'hébergement ; 21,2 % pour les prestations de services commerciales ou artisanales (BIC) ; 24,6 % pour les autres prestations et libéraux BNC ; 23,2 % pour les libéraux réglementés affiliés à la CIPAV."},
+
+  {id:20,t:"me",d:"m",
+   q:"Quel est le seuil de chiffre d'affaires de base en dessous duquel une entreprise commerciale (vente de marchandises) bénéficie de la franchise en base de TVA ?",
+   o:["83 600 € HT","77 700 € HT","85 000 € HT","93 500 € HT"],
+   a:2,e:"Les seuils de franchise TVA (différents des seuils micro-entreprise) sont : seuil de base à 85 000 € pour les activités commerciales, et 37 500 € pour les prestations de services artisanales/commerciales et libérales."},
+
+  {id:21,t:"me",d:"m",
+   q:"Un micro-entrepreneur éligible choisit d'opter pour le prélèvement libératoire de l'IR. Pour une activité d'achat-revente, quel taux s'applique directement sur le chiffre d'affaires déclaré ?",
+   o:["2,2 % du CA","1,7 % du CA","1 % du CA","0,5 % du CA"],
+   a:2,e:"Taux du prélèvement libératoire : 1 % pour l'achat-revente et fourniture de logement ; 1,7 % pour les prestations de services artisanales/commerciales (BIC) ; 2,2 % pour les autres prestations de services (BNC libéraux)."},
+
+  {id:22,t:"me",d:"m",
+   q:"Depuis quelle loi et à partir de quel seuil de chiffre d'affaires l'ouverture d'un compte bancaire dédié à l'activité professionnelle devient-elle obligatoire pour un micro-entrepreneur ?",
+   o:["Dès la création de la micro-entreprise, sans condition","Dès le premier euro de chiffre d'affaires généré","Loi PACTE du 22 mai 2019 : si le CA dépasse 10 000 € sur au moins deux années consécutives","Uniquement si le CA dépasse le seuil de franchise en base de TVA"],
+   a:2,e:"La loi PACTE du 22/05/2019 rend obligatoire un compte bancaire dédié à l'activité professionnelle uniquement lorsque le CA est supérieur à 10 000 € pendant au moins 2 années civiles consécutives."},
+
+  {id:23,t:"me",d:"m",
+   q:"Un micro-entrepreneur prestataire de services voit son chiffre d'affaires dépasser le seuil de base de la franchise TVA. À quel seuil majoré peut-il encore maintenir la franchise, et à partir de quand la TVA s'applique-t-elle si ce seuil est dépassé ?",
+   o:["Seuil majoré à 37 500 €, TVA dès le 1er janvier de l'année suivante","Seuil majoré à 41 250 €, TVA applicable dès le 1er jour du mois de dépassement du seuil majoré","Seuil majoré à 83 600 €, TVA applicable à partir du trimestre suivant","Seuil majoré à 85 000 €, TVA applicable dès le lendemain du dépassement"],
+   a:1,e:"Seuils TVA majorés : 41 250 € pour les services, 93 500 € pour le commerce. Si le seuil majoré est dépassé, la franchise en base de TVA cesse de s'appliquer dès le 1er jour du mois de dépassement (effet potentiellement rétroactif)."},
+
+  {id:24,t:"me",d:"h",
+   q:"Une entreprise commerciale réalise 82 000 € de CA en 2024, puis 90 500 € en 2025. Le seuil de base de franchise TVA est à 85 000 € et le seuil majoré à 93 500 €. Cette entreprise perd-elle la franchise en base de TVA en 2025 ?",
+   o:["Oui, car son CA 2025 dépasse le seuil de base de 85 000 €","Non, car le CA de l'année précédente (2024) est inférieur au seuil de base, et le CA 2025 est inférieur au seuil majoré de 93 500 €","Oui, dès le 1er janvier 2025, automatiquement","Non, car elle reste en dessous du seuil micro-entreprise de 203 100 €"],
+   a:1,e:"La franchise se maintient si deux conditions cumulatives sont réunies : (1) CA N-1 (2024 = 82 000 €) inférieur au seuil de base (85 000 €) ✓, ET (2) CA N (2025 = 90 500 €) inférieur au seuil majoré (93 500 €) ✓. Les deux sont remplies, la franchise est maintenue."},
+
+  {id:25,t:"me",d:"h",
+   q:"Un micro-entrepreneur souhaite opter pour le prélèvement libératoire de l'impôt sur le revenu. Quelle condition liée au revenu de son foyer doit-il impérativement respecter ?",
+   o:["Son chiffre d'affaires doit être inférieur à 83 600 €","Le revenu fiscal de référence (RFR) de son foyer doit être inférieur ou égal à 28 797 € par part de quotient familial","Son bénéfice net annuel ne doit pas dépasser 20 000 €","Il n'existe aucune condition de revenu pour bénéficier de cette option"],
+   a:1,e:"Seuls les contribuables dont le RFR (revenu fiscal de référence, consultable sur l'avis d'imposition) du foyer est inférieur ou égal à 28 797 € par part de quotient familial peuvent opter pour le prélèvement libératoire."},
+
+  {id:26,t:"me",d:"h",
+   q:"Un micro-entrepreneur éligible exerce une activité de vente de marchandises et opte pour le prélèvement libératoire de l'IR. Son CA annuel est de 60 000 €. Quel montant d'impôt sur le revenu devra-t-il acquitter au titre de cette activité ?",
+   o:["60 000 × 34 % d'abattement, puis IR au barème = environ 5 200 €","60 000 × 1 % = 600 €","60 000 × 71 % d'abattement, puis barème progressif de l'IR","60 000 × 1,7 % = 1 020 €"],
+   a:1,e:"Avec le prélèvement libératoire, le taux pour l'achat-revente est de 1 % du CA. Soit 60 000 × 1 % = 600 €. Sans cette option, l'abattement de 71 % s'appliquerait, puis le barème progressif de l'IR."},
+
+  {id:27,t:"me",d:"h",
+   q:"Parmi les professions suivantes exercées à titre libéral, laquelle est exclue du régime de la micro-entreprise car elle relève d'une profession libérale réglementée ne dépendant pas de la caisse CIPAV ?",
+   o:["Graphiste designer freelance","Développeur web indépendant","Expert-comptable","Photographe de mariage"],
+   a:2,e:"Sont exclus du régime micro-entreprise : les professions libérales réglementées ne relevant pas de la CIPAV, notamment les avocats, médecins, notaires et experts-comptables. Graphistes, développeurs et photographes peuvent en revanche être micro-entrepreneurs."},
+
+  {id:28,t:"me",d:"m",
+   q:"En 2026, quel est le plafond annuel de chiffre d'affaires applicable à une micro-entreprise exerçant une activité d'achat-revente de marchandises ou une prestation d'hébergement ?",
+   o:["188 700 € par an","203 100 € par an","77 700 € par an","83 600 € par an"],
+   a:1,e:"Seuils 2026-2027-2028 : 203 100 €/an pour les activités d'achat-revente, vente à consommer sur place, ou prestation d'hébergement. Ce seuil a augmenté par rapport aux 188 700 € applicables jusqu'en 2025."},
+
+  {id:29,t:"me",d:"m",
+   q:"Le dispositif ACRE permet à certains micro-entrepreneurs de bénéficier d'un avantage sur leurs cotisations sociales la première année. En quoi consiste concrètement cet avantage ?",
+   o:["Une exonération totale des cotisations sociales pendant 12 mois","Une réduction de 25 % sur les cotisations sociales pendant la première année d'activité","Une exonération de 50 % des cotisations pendant 2 ans","Une réduction de 10 % des cotisations pendant 3 ans"],
+   a:1,e:"L'ACRE consiste en une exonération partielle des charges sociales de 25 % pendant la première année d'activité, sous conditions (moins de 26 ans, demandeur d'emploi, bénéficiaire du RSA, etc.). La demande se fait en ligne sur l'URSSAF."},
+
+  {id:30,t:"me",d:"f",
+   q:"Le régime de la micro-entreprise est-il accessible aux étudiants qui poursuivent leurs études en parallèle d'une activité professionnelle ?",
+   o:["Non, il faut avoir terminé ses études et justifier d'une activité principale","Oui, le régime est explicitement ouvert aux étudiants souhaitant exercer une activité complémentaire à leurs études","Oui, mais uniquement pour les activités artistiques ou culturelles","Non, l'étudiant doit d'abord finir ses études pour s'immatriculer"],
+   a:1,e:"Le régime micro-entrepreneur est expressément ouvert aux étudiants qui souhaitent développer une activité professionnelle — principale ou complémentaire — sans interrompre leurs études."},
+
+  // ARTISTE-AUTEUR
+  {id:31,t:"aa",d:"f",
+   q:"Un illustrateur indépendant souhaite créer son activité d'auteur. À quel organisme de sécurité sociale doit-il s'affilier pour bénéficier du régime spécifique aux artistes-auteurs ?",
+   o:["Directement à l'URSSAF, comme un travailleur indépendant (TNS)","À l'AGESSA et à la Maison des Artistes, rattachés au régime général","À Pôle Emploi / France Travail","À la Mutuelle Sociale Agricole (MSA)"],
+   a:1,e:"L'artiste-auteur s'affilie à l'AGESSA (auteurs d'oeuvres littéraires, dramatiques, musicales, audiovisuelles) ou à la Maison des Artistes (arts visuels, graphiques et plastiques). Ce régime est rattaché au régime général."},
+
+  {id:32,t:"aa",d:"f",
+   q:"Le régime de sécurité sociale des artistes-auteurs offre des protections sociales comparables à celles des salariés pour certaines prestations. Cependant, une protection sociale majeure reste inaccessible. Laquelle ?",
+   o:["L'assurance maladie-maternité","La retraite de base et complémentaire","L'assurance chômage et la protection contre les accidents du travail","La couverture invalidité-décès"],
+   a:2,e:"Le régime artiste-auteur est rattaché au régime général pour la maladie, la maternité et la retraite. Cependant, l'artiste-auteur n'a PAS accès aux allocations chômage ni à la protection accidents du travail des salariés."},
+
+  {id:33,t:"aa",d:"f",
+   q:"Parmi les activités suivantes réalisées par un créateur numérique, laquelle entre dans le champ du régime des artistes-auteurs ?",
+   o:["La mise à jour hebdomadaire du site web d'une entreprise cliente","La création d'un jeu vidéo interactif original conçu en dehors d'un contrat de travail","La réalisation de plans techniques et dessins industriels","L'administration et la maintenance d'un serveur (webmastering)"],
+   a:1,e:"Un jeu vidéo original constitue une oeuvre multimédia créative éligible au régime artiste-auteur, dès lors qu'il porte l'empreinte de la personnalité de l'auteur et est créé hors contrat de travail. Les activités techniques (maintenance, mise à jour, plans) en sont exclues."},
+
+  {id:34,t:"aa",d:"f",
+   q:"Un artiste-auteur opte pour le régime micro-BNC pour sa déclaration fiscale. Quel abattement forfaitaire s'applique sur ses recettes brutes pour déterminer son revenu imposable ?",
+   o:["71 % des recettes brutes","50 % des recettes brutes","34 % des recettes brutes","15 % des recettes brutes"],
+   a:2,e:"En régime micro-BNC, l'abattement forfaitaire est de 34 % sur les recettes déclarées. Cet abattement est censé représenter toutes les charges professionnelles. Si les charges réelles dépassent 34 %, la déclaration contrôlée est plus avantageuse."},
+
+  {id:35,t:"aa",d:"m",
+   q:"Un illustrateur débutant réalise 60 000 € de recettes annuelles. Il se demande s'il peut encore opter pour le régime fiscal simplifié micro-BNC. Est-ce possible, et quel est le seuil déterminant ?",
+   o:["Non, le seuil micro-BNC est fixé à 83 600 €, mais il n'est pas applicable aux artistes-auteurs","Oui, car son CA est inférieur à 77 700 € : il peut choisir entre micro-BNC (abattement 34 %) et déclaration contrôlée","Non, la déclaration contrôlée est obligatoire dès 37 500 €","Oui, mais le seuil est de 100 000 €"],
+   a:1,e:"Si le CA est inférieur à 77 700 €, l'artiste-auteur peut choisir entre le régime micro-BNC (abattement forfaitaire de 34 %) et le régime de la déclaration contrôlée (comptabilité recettes-dépenses réelles). Au-dessus de 77 700 €, la déclaration contrôlée est obligatoire."},
+
+  {id:36,t:"aa",d:"m",
+   q:"Un artiste-auteur en régime micro-BNC déclare 10 000 € de recettes à l'URSSAF. Quelle sera l'assiette sociale retenue pour le calcul de ses cotisations sociales ?",
+   o:["10 000 € (les recettes brutes déclarées)","6 600 € (après abattement de 34 % uniquement)","7 590 € (après abattement de 34 % puis majoration de 15 %)","8 500 € (après abattement forfaitaire de 15 %)"],
+   a:2,e:"Assiette sociale micro-BNC = recettes × (1 - 34 %) × 1,15. Calcul : 10 000 × 0,66 = 6 600 € puis 6 600 × 1,15 = 7 590 €. Cette majoration de 15 % est spécifique au régime social des artistes-auteurs."},
+
+  {id:37,t:"aa",d:"m",
+   q:"Un artiste-auteur déclarant sous le régime de la déclaration contrôlée (BNC) doit s'acquitter de ses cotisations sociales trimestriellement. À quelles dates précises ces paiements sont-ils dus ?",
+   o:["Les 31 mars, 30 juin, 30 septembre et 31 décembre","Les 15 janvier, 15 avril, 15 juillet et 15 octobre","Les 1er janvier, 1er avril, 1er juillet et 1er octobre","Une fois par an, avant le 31 mai"],
+   a:1,e:"Les cotisations sociales en BNC (déclaration contrôlée) sont payées trimestriellement aux dates suivantes : 15 janvier, 15 avril, 15 juillet et 15 octobre. Les revenus déclarés par des diffuseurs (éditeurs, SACEM) font l'objet d'un précompte directement effectué par le diffuseur."},
+
+  {id:38,t:"aa",d:"m",
+   q:"En 2024, un photographe artiste-auteur donne régulièrement des cours en dehors de son atelier et participe à des débats publics sans lien direct avec ses oeuvres. Ces activités accessoires sont-elles couvertes par le régime artiste-auteur, et jusqu'à quel plafond ?",
+   o:["Oui, sans limite de montant dès lors qu'elles sont accessoires à l'activité artistique","Oui, dans la limite de 13 980 € de revenus issus de ces activités accessoires par an en 2024","Non, les activités accessoires relèvent systématiquement du régime TNS","Oui, dans la limite de 5 000 € par an"],
+   a:1,e:"En 2024, les activités accessoires (cours en atelier, débats, ateliers d'écriture, etc.) peuvent relever du régime artiste-auteur dans la limite de 13 980 € par an, à condition que l'auteur ait perçu des revenus artistiques l'année en cours ou dans les 2 années précédentes."},
+
+  {id:39,t:"aa",d:"h",
+   q:"Un artiste-auteur souhaite estimer le montant total de ses cotisations sociales. Quel est le taux global applicable à son assiette sociale (toutes cotisations et contributions confondues) ?",
+   o:["21,2 % de l'assiette sociale","24,6 % de l'assiette sociale","16,2 % de l'assiette sociale","35 % de l'assiette sociale"],
+   a:2,e:"Taux total : 16,2 % comprenant : SS 0,40 % (pris en charge par l'État), retraite plafonnée 6,90 % (dont 0,75 % pris en charge par l'État), CSG 9,20 % (dont 6,80 % déductibles fiscalement), CRDS 0,50 %, CFP 0,35 %."},
+
+  {id:40,t:"aa",d:"h",
+   q:"Pierre est salarié dans une agence de communication et crée, dans le cadre de ses fonctions et avec les ressources de l'entreprise, un logo original pour un client. Peut-il prétendre au régime artiste-auteur pour cette création et percevoir des droits d'auteur à titre personnel ?",
+   o:["Oui, automatiquement, car toute création originale appartient à son auteur","Oui, à condition d'avoir négocié et fait inclure une clause spécifique dans son contrat de travail","Non, les salariés qui créent des oeuvres dans le cadre de leur contrat de travail sont exclus du régime artiste-auteur","Oui, si l'oeuvre est reconnue comme originale par une commission artistique"],
+   a:2,e:"Les auteurs salariés qui créent des oeuvres dans le cadre de leur travail (missions définies, ressources de l'employeur) sont exclus du régime artiste-auteur. Une clause contractuelle peut toutefois être négociée pour organiser le partage des droits."},
+
+  {id:41,t:"aa",d:"h",
+   q:"Les revenus d'un artiste-auteur sont en principe classés dans quelle catégorie fiscale pour leur déclaration à l'impôt sur le revenu ?",
+   o:["Traitements et salaires, systématiquement","BIC – Bénéfices Industriels et Commerciaux","BNC – Bénéfices Non Commerciaux, sauf si déclarés par un tiers","BA – Bénéfices Agricoles"],
+   a:2,e:"Les revenus des artistes-auteurs relèvent par défaut des BNC. Toutefois, les revenus intégralement déclarés par un tiers (éditeurs, producteurs, SACEM…) peuvent être imposés dans la catégorie Traitements & Salaires, avec la possibilité de renoncer à ce classement."},
+
+  {id:42,t:"aa",d:"m",
+   q:"La CSG (Contribution Sociale Généralisée) fait partie des cotisations dues par les artistes-auteurs. Quel est son taux exact, et quelle fraction est déductible fiscalement ?",
+   o:["7,5 % dont 5,1 % déductibles","9,2 % dont 6,8 % déductibles fiscalement","6,8 % dont la totalité est déductible","17,2 % dont 6,8 % déductibles"],
+   a:1,e:"La CSG est de 9,20 %, dont 6,80 % sont déductibles fiscalement (ces 6,80 % viennent réduire le revenu imposable de l'artiste-auteur). Les 2,40 % restants ne sont pas déductibles."},
+
+  // CRÉATION DE SOCIÉTÉ
+  {id:43,t:"sc",d:"f",
+   q:"Pierre et Alix décident de s'associer pour créer une société de communication. Quel acte juridique fondamental vont-ils devoir rédiger pour donner naissance à leur société et fixer ses règles de fonctionnement ?",
+   o:["Un procès-verbal d'assemblée générale constitutive","Les statuts de la société","Le Kbis de la société","Une déclaration d'activité auprès des impôts"],
+   a:1,e:"Les statuts sont l'acte fondateur (contrat entre associés, ou acte unilatéral pour l'associé unique) de la société. Ils fixent la forme, la dénomination, le capital, la durée (max 99 ans), l'objet, le siège et les organes de direction. L'immatriculation confère la personnalité morale."},
+
+  {id:44,t:"sc",d:"f",
+   q:"Une SAS soumise à l'impôt sur les sociétés réalise un bénéfice de 100 000 €. À quel taux normal l'IS sera-t-il appliqué sur ce résultat (hors taux réduit) ?",
+   o:["15 % sur la totalité","20 % sur la totalité","25 % sur la totalité","33,33 % sur la totalité"],
+   a:2,e:"Le taux normal de l'IS est de 25 %. Un taux réduit de 15 % s'applique sur la fraction de bénéfice inférieure à 42 500 € sous conditions (dont la libération totale du capital). Au-delà, le taux de 25 % s'applique."},
+
+  {id:45,t:"sc",d:"f",
+   q:"Marco est passionné de cuisine et apporte à la société qu'il crée avec ses associés ses recettes exclusives, son réseau professionnel et sa réputation dans le milieu gastronomique. À quel type d'apport cela correspond-il ?",
+   o:["Un apport en numéraire (somme d'argent)","Un apport en nature (bien corporel ou incorporel)","Un apport en industrie (compétences, savoir-faire, notoriété)","Un apport en garantie"],
+   a:2,e:"L'apport en industrie correspond à la mise à disposition de compétences, savoir-faire, travail, services ou notoriété. Contrairement aux apports en numéraire et en nature, il ne constitue PAS le capital social et les titres issus de cet apport ne sont pas transmissibles à des tiers."},
+
+  {id:46,t:"sc",d:"f",
+   q:"Deux créatifs veulent s'associer pour créer leur agence. L'un préfère la souplesse statutaire pour attirer des investisseurs, l'autre veut un cadre juridique plus encadré et rassurant. Quelle est la différence fondamentale entre SAS et SARL à cet égard ?",
+   o:["La SAS a un capital minimum plus élevé que la SARL","La SAS est réservée aux activités artistiques et créatives","La SAS offre une grande liberté rédactionnelle des statuts ; la SARL est plus rigide car son fonctionnement est largement encadré par le Code de commerce","La SARL peut accueillir des associés personnes morales, la SAS non"],
+   a:2,e:"La SAS est la forme la plus répandue car ses statuts sont librement rédigés (organes de direction, droits de vote différenciés, clauses d'agrément…). La SARL est plus rigide car ses statuts reprennent le cadre du Code de commerce, mais cela apporte une sécurité juridique appréciée."},
+
+  {id:47,t:"sc",d:"f",
+   q:"Une société vient d'être immatriculée au Registre du Commerce et des Sociétés. Quel document officiel lui est délivré et qui constitue sa carte d'identité légale ?",
+   o:["Les statuts signés par les associés fondateurs","L'extrait Kbis délivré par le greffe du tribunal de commerce","L'acte de naissance de la société rédigé par un notaire","La déclaration d'existence transmise à l'URSSAF"],
+   a:1,e:"Le Kbis (extrait du Registre du Commerce et des Sociétés) est le document officiel qui atteste de l'existence légale de la société et de son immatriculation. Il est délivré par le greffe du tribunal de commerce via le guichet unique de l'INPI."},
+
+  {id:48,t:"sc",d:"m",
+   q:"Lors de la création d'une SAS, M. A apporte 10 000 € en numéraire, Mme B apporte du matériel informatique évalué à 6 000 €, et M. C s'engage à consacrer son expertise technique à la société pour une valeur estimée à 8 000 €. Quel est le montant du capital social de cette société ?",
+   o:["24 000 € (la somme des trois apports)","18 000 € (numéraire + nature uniquement)","16 000 € (numéraire + nature uniquement)","10 000 € (numéraire seulement)"],
+   a:2,e:"Le capital social est constitué uniquement des apports en numéraire et en nature : 10 000 € + 6 000 € = 16 000 €. L'apport en industrie de M. C (8 000 €) ne contribue pas au capital mais lui donne droit à des titres spécifiques (vote + bénéfices)."},
+
+  {id:49,t:"sc",d:"m",
+   q:"Dans une SARL, le gérant détient exactement 50 % des parts sociales. Est-il considéré comme gérant majoritaire, et quel régime social lui est donc applicable ?",
+   o:["Oui, il est majoritaire et relève du régime TNS","Non, à 50 % exactement il est qualifié de gérant égalitaire, ce qui le rattache au régime général des salariés s'il est rémunéré","Oui, toute détention de 50 % ou plus déclenche automatiquement le statut de gérant majoritaire","Non, il ne devient majoritaire qu'à partir de 75 % du capital"],
+   a:1,e:"Le gérant est majoritaire uniquement s'il détient STRICTEMENT PLUS de 50 % (50 % + 1 part minimum). À 50 % exactement, il est gérant égalitaire et relève du régime général (assimilé salarié) s'il est rémunéré."},
+
+  {id:50,t:"sc",d:"m",
+   q:"Une PME soumise à l'IS réalise un bénéfice annuel de 35 000 €. Son capital est intégralement libéré. Quel taux d'imposition s'applique à ce bénéfice ?",
+   o:["10 % (taux réduit PME)","15 % (taux réduit pour bénéfices < 42 500 € sous conditions)","20 % (taux intermédiaire)","25 % (taux normal de l'IS)"],
+   a:1,e:"Le taux réduit d'IS à 15 % s'applique aux PME dont le capital est intégralement libéré et détenu à au moins 75 % par des personnes physiques, sur la fraction de bénéfice inférieure à 42 500 €. Au-delà, le taux normal de 25 % s'applique."},
+
+  {id:51,t:"sc",d:"m",
+   q:"Le président d'une SAS perçoit une rémunération mensuelle pour ses fonctions de direction. À quel régime de protection sociale est-il affilié en tant que dirigeant rémunéré ?",
+   o:["Régime TNS (Travailleurs Non-Salariés), comme le gérant majoritaire de SARL","Régime général de la Sécurité sociale (statut assimilé salarié)","Régime des artistes-auteurs, si ses activités sont créatives","Il n'est soumis à aucun régime obligatoire"],
+   a:1,e:"Le président de SAS rémunéré est affilié au régime général de la Sécurité sociale avec le statut d'assimilé salarié (cotisations plus élevées mais protection similaire aux salariés). À l'inverse, le gérant majoritaire de SARL relève du régime TNS."},
+
+  {id:52,t:"sc",d:"m",
+   q:"Depuis le 1er janvier 2026, à quel taux global les dividendes distribués aux associés sont-ils soumis par défaut dans le cadre du Prélèvement Forfaitaire Unique (PFU ou Flat Tax) ?",
+   o:["30 % = 12,8 % d'IR + 17,2 % de prélèvements sociaux (avant 2026)","31,4 % = 12,8 % d'IR + 18,6 % de prélèvements sociaux (taux en vigueur depuis 2026)","25 % correspondant au taux de l'IS uniquement","15 % pour les PME et 25 % pour les grandes entreprises"],
+   a:1,e:"La loi de finances pour 2026 a porté le PFU à 31,4 % (contre 30 % auparavant), décomposé en 12,8 % d'impôt sur le revenu et 18,6 % de prélèvements sociaux. Option possible pour le barème progressif avec abattement de 40 %."},
+
+  {id:53,t:"sc",d:"m",
+   q:"Lors de la création d'une SAS, les associés s'interrogent sur le calendrier de libération des apports en numéraire. Quelle fraction minimale doit être versée effectivement à la création, et dans quel délai le solde doit-il être libéré ?",
+   o:["10 % à la création, solde dans un délai de 10 ans","20 % à la création, solde dans un délai de 5 ans (comme pour la SARL)","Au moins 50 % à la création, solde dans un délai de 5 ans","La totalité doit être versée avant l'immatriculation"],
+   a:2,e:"En SAS : au moins 50 % des apports en numéraire doivent être libérés à la création, le reste dans un délai maximum de 5 ans. En SARL : seulement 20 % à la création, solde en 5 ans. Cette différence peut influencer le choix de la forme juridique."},
+
+  {id:54,t:"sc",d:"h",
+   q:"Dans une SARL, à quelle condition précise un gérant est-il qualifié de gérant majoritaire, et quel régime social en découle ?",
+   o:["Il détient seul strictement plus de 50 % des parts, OU avec son conjoint (quel que soit le régime matrimonial) et ses enfants mineurs dépasse 50 % → régime TNS","Il dirige seul la société sans co-gérant, quel que soit son pourcentage de détention","La rémunération du gérant représente plus de 50 % des charges de la société","Il a été nommé gérant par une décision prise à la majorité des associés"],
+   a:0,e:"Gérant majoritaire = détient seul > 50 % des parts sociales, OU avec son conjoint (tout régime matrimonial) + ses enfants mineurs > 50 %, OU par société interposée > 50 %. Dans tous ces cas → régime TNS. Sinon (minoritaire/égalitaire rémunéré) → régime général."},
+
+  {id:55,t:"sc",d:"h",
+   q:"Le gérant majoritaire d'une SARL perçoit des dividendes en plus de sa rémunération. Quelle fraction de ces dividendes est soumise aux cotisations sociales TNS, en plus des prélèvements sociaux habituels ?",
+   o:["La totalité des dividendes est systématiquement soumise aux cotisations sociales TNS","La fraction des dividendes qui dépasse 10 % de la somme du capital social et du compte courant d'associé est soumise aux cotisations TNS","La fraction des dividendes dépassant 50 % de sa rémunération nette annuelle","Les dividendes ne sont jamais soumis à des cotisations sociales, quelle que soit la forme juridique"],
+   a:1,e:"Pour le gérant majoritaire de SARL, la fraction des dividendes excédant 10 % du (capital social + compte courant d'associé) est assujettie aux cotisations sociales TNS (35-49 %). Cette règle anti-optimisation vise à éviter que le gérant remplace sa rémunération par des dividendes. En deçà de ce seuil : PFU à 31,4 %."},
+
+  {id:56,t:"sc",d:"h",
+   q:"Une SAS est soumise à l'IS par défaut. Dans quelles conditions ses associés peuvent-ils décider de passer temporairement à l'imposition des bénéfices à l'IR, et pour combien de temps ?",
+   o:["Jamais, une SAS est définitivement et exclusivement soumise à l'IS","Sous conditions restrictives, pour une période maximum de 5 ans non renouvelable","Sans aucune restriction, pour une durée illimitée","Uniquement si le capital de la SAS est inférieur à 10 000 €"],
+   a:1,e:"Les SAS et SARL soumises à l'IS peuvent opter pour l'IR sous conditions (ex : société récente, peu d'associés, activité non financière), pour une durée maximum de 5 ans non renouvelable. L'EURL dont l'associé unique est gérant est à l'IR par défaut avec option IS possible."},
+
+  {id:57,t:"sc",d:"h",
+   q:"Une société de conseil en design réalise un chiffre d'affaires de 300 000 € HT en prestations de services. Quel régime de TVA lui est obligatoirement applicable, et quelle obligation déclarative cela implique-t-il ?",
+   o:["La franchise en base de TVA, elle ne déclare donc pas la TVA","Le régime simplifié d'imposition, avec deux acomptes semestriels","Le régime réel normal de TVA, avec une déclaration mensuelle de TVA","Un régime forfaitaire spécifique aux sociétés créatives"],
+   a:2,e:"Le régime réel normal de TVA est obligatoire dès que le CA dépasse 254 000 € HT pour les services (ou 840 000 € pour le commerce). Il implique une déclaration de TVA mensuelle (CA3) récapitulant toutes les opérations du mois précédent."},
+
+  {id:58,t:"sc",d:"h",
+   q:"Un associé d'une SARL opte pour l'imposition de ses dividendes au barème progressif de l'IR plutôt qu'au PFU. Pour bénéficier de l'abattement de 40 % qui compense la double imposition, quelles conditions doit-il impérativement respecter ?",
+   o:["Être le gérant majoritaire et détenir plus de 50 % du capital","Les dividendes ont été décidés en assemblée générale ET la société est française ou a son siège dans un pays de l'UE ou en accord fiscal avec la France","Le CA de la société est inférieur à 10 M€ et le capital est intégralement libéré","Il n'y a aucune condition particulière pour bénéficier de l'abattement de 40 %"],
+   a:1,e:"L'abattement de 40 % (destiné à compenser la double imposition dividendes-IR) exige : (1) décision de distribution prise en assemblée générale ET (2) société distributrice établie en France, en UE ou dans un État ayant conclu avec la France un accord d'élimination des doubles impositions."},
+
+  {id:59,t:"sc",d:"m",
+   q:"Lors de la rédaction des statuts, les associés d'une SAS se demandent quelle durée maximale légale ils peuvent prévoir pour leur société. Quelle est cette durée limite ?",
+   o:["50 ans non renouvelables","75 ans renouvelables une fois","99 ans, renouvelables indéfiniment","La durée est illimitée par défaut"],
+   a:2,e:"La durée de vie d'une société est librement fixée par les associés dans les statuts, mais ne peut dépasser 99 ans. À l'expiration, les associés peuvent voter la prorogation pour une nouvelle période. La plupart des statuts prévoient 99 ans."},
+
+  {id:60,t:"sc",d:"m",
+   q:"Lors de la création d'une société, un associé apporte un fonds de commerce évalué à 25 000 € et des équipements valant 8 000 €, soit 33 000 € d'apports en nature au total pour un capital de 50 000 €. Un commissaire aux apports est-il obligatoire pour évaluer ces apports ?",
+   o:["Non, un commissaire aux apports n'est jamais obligatoire pour les apports en nature","Oui, car chaque apport en nature est obligatoirement évalué par un commissaire aux apports","Oui, car le fonds de commerce dépasse 30 000 € OU parce que le total des apports en nature dépasse 50 % du capital social","Non, les associés peuvent toujours évaluer librement leurs apports en nature"],
+   a:2,e:"Le commissaire aux apports est obligatoire dès lors qu'un apport en nature unitaire dépasse 30 000 € (le fonds de commerce à 25 000 € est inférieur), OU que la valeur totale des apports en nature dépasse 50 % du capital. Ici, 33 000 € > 50 % × 50 000 € = 25 000 € → commissaire obligatoire."},
 ];
 
-// ═══════════════════════════════════════════
+const DES_Q=[
+  {id:101,t:"da",d:"f",
+   q:"Un étudiant en design crée une affiche originale pour son portfolio. Son professeur lui explique que cette création est déjà protégée. Quelle condition essentielle cette affiche doit-elle remplir pour bénéficier de la protection du droit d'auteur ?",
+   o:["Elle doit avoir été déposée préalablement à l'INPI ou auprès d'une société d'auteurs","Elle doit être originale, c'est-à-dire porter l'empreinte de la personnalité de son auteur","Elle doit avoir fait l'objet d'une publication commerciale ou d'une exposition publique","Elle doit avoir été créée dans le cadre d'un contrat de commande ou d'une mission professionnelle"],
+   a:1,e:"Le droit d'auteur protège automatiquement toute oeuvre originale dès sa création, sans dépôt ni formalité préalable. L'originalité signifie que l'oeuvre porte l'empreinte de la personnalité de l'auteur, reflet de ses choix créatifs propres."},
+
+  {id:102,t:"da",d:"f",
+   q:"Un designer freelance crée une identité visuelle pour un client. À partir de quel moment cette création est-elle protégée par le droit d'auteur en droit français ?",
+   o:["À partir du moment où elle est déposée à l'INPI ou enregistrée officiellement","Dès le moment de sa livraison au client et du paiement de la facture","Dès l'instant de sa création, automatiquement et sans aucune formalité requise","À compter de sa première publication ou diffusion au public"],
+   a:2,e:"En droit français, la protection par le droit d'auteur est automatique et naît dès la création de l'oeuvre, sans aucune formalité requise (pas de dépôt, pas d'enregistrement). C'est une différence fondamentale avec le droit des marques ou des brevets qui exigent un dépôt."},
+
+  {id:103,t:"da",d:"f",
+   q:"L'illustratrice Sophie décède en laissant une oeuvre considérable. Pendant combien de temps à compter de son décès ses héritiers bénéficieront-ils de la protection du droit d'auteur sur son oeuvre ?",
+   o:["50 ans après son décès, conformément aux conventions internationales","70 ans après son décès, délai à l'issue duquel l'oeuvre tombe dans le domaine public","99 ans à compter de la date de création de chaque oeuvre","La protection est perpétuelle et les héritiers en jouissent indéfiniment"],
+   a:1,e:"En France et dans l'Union européenne, le droit d'auteur est protégé pendant 70 ans après la mort de l'auteur. À l'issue de ce délai, l'oeuvre tombe dans le domaine public et peut être librement utilisée, sous réserve du respect permanent des droits moraux."},
+
+  {id:104,t:"da",d:"f",
+   q:"Un directeur artistique dont l'oeuvre a été modifiée sans son accord par un client invoque ses droits moraux d'auteur. Parmi les propositions suivantes, laquelle décrit le mieux la nature des droits moraux ?",
+   o:["Les droits moraux sont des droits patrimoniaux qui permettent à l'auteur de percevoir une rémunération pour l'exploitation de son oeuvre","Les droits moraux sont des droits perpétuels et inaliénables de l'auteur sur son oeuvre, comprenant notamment le droit à la paternité, à l'intégrité, à la divulgation et au repentir","Les droits moraux sont des droits cessibles qui peuvent être transférés à une société d'édition par contrat","Les droits moraux s'éteignent au moment du décès de l'auteur, à la différence des droits patrimoniaux"],
+   a:1,e:"Les droits moraux (paternité, intégrité, divulgation, retrait/repentir) sont perpétuels, inaliénables et imprescriptibles. Contrairement aux droits patrimoniaux (reproduction, représentation), ils ne peuvent jamais être cédés ou abandonnés, même contractuellement."},
+
+  {id:105,t:"da",d:"f",
+   q:"Un éditeur propose à un auteur illustrateur d'inclure dans leur contrat une clause par laquelle l'auteur renonce à son droit moral sur les illustrations qu'il créera. Cette clause est-elle juridiquement valide ?",
+   o:["Oui, si l'auteur la signe librement et reçoit une compensation financière suffisante","Oui, à condition que la renonciation soit limitée dans le temps et précisément décrite","Non, les droits moraux sont inaliénables et aucune clause contractuelle ne peut y déroger","Non, mais l'auteur peut accepter de ne pas exercer ses droits moraux de façon tacite"],
+   a:2,e:"Les droits moraux sont inaliénables au sens strict du terme : aucun contrat, aucune clause, aucune transaction ne peut priver l'auteur de ses droits moraux. Toute renonciation contractuelle aux droits moraux est réputée non écrite. C'est un principe fondamental du droit d'auteur français."},
+
+  {id:106,t:"da",d:"m",
+   q:"Un photographe freelance cède à un magazine le droit de reproduire ses photos dans son édition papier mensuelle. En quoi consiste précisément le droit de reproduction qu'il cède ?",
+   o:["Le droit d'obtenir des copies physiques de ses tirages originaux","Le droit exclusif d'autoriser toute fixation matérielle de son oeuvre sur n'importe quel support : impression papier, format numérique, affichage, etc.","Le droit de représenter ses oeuvres lors d'expositions ou d'événements publics","Le droit de modifier et d'adapter ses photographies selon les besoins éditoriaux"],
+   a:1,e:"Le droit de reproduction est le droit exclusif d'autoriser toute fixation matérielle de l'oeuvre sur un support (impression, numérisation, diffusion en ligne, etc.). C'est un droit patrimonial cessible. Il est distinct du droit de représentation (communication au public) et du droit de suite."},
+
+  {id:107,t:"da",d:"m",
+   q:"Une marque de mode commande à un graphiste la création complète de son identité visuelle (logo, charte graphique, packaging) et le rémunère généreusement. Qui est titulaire des droits d'auteur sur ces créations, en l'absence de tout contrat de cession ?",
+   o:["La marque, car elle a financé et commandé les créations","Le graphiste freelance, qui conserve ses droits d'auteur en l'absence de cession contractuelle expresse","Les deux parties à égalité, dans le cadre d'une co-création reconnue par la loi","L'INPI, en tant qu'organisme dépositaire de la propriété intellectuelle"],
+   a:1,e:"Dans une oeuvre de commande, le créateur freelance reste titulaire de ses droits d'auteur. Le paiement de la prestation ne transfère PAS automatiquement les droits. Le client ne dispose que d'une licence implicite pour l'usage convenu. Toute cession doit être expressément stipulée par écrit dans un contrat."},
+
+  {id:108,t:"da",d:"m",
+   q:"Trois artistes décident de créer ensemble une installation multimédia originale, chacun contribuant à une partie différente de l'oeuvre. Cette collaboration donne naissance à quel type d'oeuvre, avec quelles conséquences pour la gestion des droits ?",
+   o:["Une oeuvre collective placée sous le contrôle exclusif de l'initiateur du projet","Une oeuvre de collaboration créée conjointement, dont les droits sont gérés en indivision et les décisions d'exploitation prises à l'unanimité","Trois oeuvres individuelles autonomes, chaque artiste restant seul maître de sa contribution","Une oeuvre anonyme dont les droits appartiennent à la collectivité"],
+   a:1,e:"L'oeuvre de collaboration est créée par la participation créative de plusieurs auteurs. Les droits sont en indivision entre les co-auteurs. Les décisions d'exploitation de l'oeuvre commune (cession, licence…) doivent être prises à l'unanimité des co-auteurs."},
+
+  {id:109,t:"da",d:"m",
+   q:"Un journaliste cite plusieurs extraits d'un roman récemment publié dans sa critique littéraire parue dans un magazine. L'auteur du roman peut-il lui reprocher une atteinte à ses droits d'auteur ?",
+   o:["Oui, toute reproduction d'extraits d'une oeuvre protégée requiert l'autorisation préalable et écrite de l'auteur","Non, la loi prévoit une exception de courte citation à des fins d'analyse ou de critique, à condition de mentionner l'auteur et la source","Non, dès lors que la critique est bienveillante et ne nuit pas à la réputation de l'auteur","Non, les oeuvres publiées commercialement peuvent être citées librement sans restriction"],
+   a:1,e:"L'exception de courte citation permet de reproduire un extrait d'une oeuvre protégée sans autorisation, à des fins d'analyse, de critique, d'enseignement ou d'information, sous deux conditions : la citation doit être courte et la source (auteur, titre) doit être clairement mentionnée."},
+
+  {id:110,t:"da",d:"m",
+   q:"Un sculpteur dont une oeuvre a été revendue aux enchères pour 50 000 € peut-il prétendre à une part du produit de cette revente ? Sur quel principe ce droit repose-t-il ?",
+   o:["Non, une fois l'oeuvre vendue, l'artiste n'a aucun droit sur les reventes ultérieures","Oui, grâce au droit de suite, qui lui permet de percevoir un pourcentage du prix de revente aux enchères publiques de ses oeuvres originales","Oui, mais uniquement si l'oeuvre est revendue à une institution publique ou un musée","Non, ce droit n'existe qu'en cas de revente entre particuliers, pas aux enchères"],
+   a:1,e:"Le droit de suite est un droit inaliénable qui permet à l'artiste-auteur de percevoir un pourcentage (entre 0,25 % et 4 % selon les tranches) sur le prix de revente de ses oeuvres originales lors de ventes aux enchères publiques. Il bénéficie également aux héritiers pendant 70 ans."},
+
+  {id:111,t:"da",d:"h",
+   q:"Paul est salarié dans une agence de publicité et crée, dans le cadre de sa mission, un logiciel de retouche d'images et un logo pour un client de l'agence. Concernant ces deux créations, qui est titulaire des droits d'auteur respectifs ?",
+   o:["L'agence est automatiquement titulaire des droits sur les deux créations, car elles ont été réalisées dans le cadre du contrat de travail","Pour le logiciel : l'employeur de plein droit par la loi. Pour le logo : le salarié Paul, sauf clause de cession dans son contrat de travail","Paul est titulaire des droits sur les deux créations, le contrat de travail ne transfère aucun droit d'auteur","L'agence est propriétaire du logo, Paul du logiciel"],
+   a:1,e:"C'est une subtilité importante : pour les LOGICIELS créés par un salarié dans l'exercice de ses fonctions, les droits d'auteur patrimoniaux sont automatiquement dévolus à l'employeur. Pour les AUTRES oeuvres (logo, illustrations, etc.), le salarié reste titulaire des droits : seule une clause expresse de cession dans le contrat peut transférer ces droits à l'employeur."},
+
+  {id:112,t:"da",d:"h",
+   q:"Un groupe de presse lance une encyclopédie numérique et coordonne le travail de dizaines de rédacteurs et illustrateurs. Le groupe publie l'encyclopédie sous son propre nom. Quel type d'oeuvre cela constitue-t-il, et qui en détient les droits ?",
+   o:["Une oeuvre de collaboration dont les droits appartiennent à l'ensemble des contributeurs","Une oeuvre collective créée sous la direction et le nom du groupe de presse, qui en est titulaire des droits comme une personne morale","Une oeuvre anonyme dont les droits appartiennent au domaine public après 25 ans","Une oeuvre composite dont les droits restent partagés entre le groupe et chaque contributeur"],
+   a:1,e:"L'oeuvre collective est créée à l'initiative et sous la direction d'une personne (physique ou morale) qui l'édite, la publie et la divulgue sous son nom. La contribution des participants se fond dans l'ensemble sans qu'il soit possible d'attribuer à chacun un droit distinct. La personne morale (ici le groupe de presse) est titulaire des droits. Ex : encyclopédies, journaux, sites web d'entreprises."},
+
+  {id:113,t:"da",d:"h",
+   q:"Un designer a créé une affiche pour un festival de musique. Le contrat prévoit son utilisation pour la communication de l'édition 2024. L'organisateur l'utilise ensuite pour un documentaire sur le festival, sans nouvelles négociations. Le designer peut-il s'y opposer ?",
+   o:["Non, car le paiement initial couvre toutes les utilisations futures de l'oeuvre","Oui, car le principe de spécialité des droits d'auteur stipule que la cession ne couvre que les droits et usages expressément mentionnés : le documentaire n'étant pas prévu, il nécessite une nouvelle autorisation","Non, dès lors que l'oeuvre a été livrée et payée, elle peut être utilisée à des fins analogues","Oui, mais uniquement si le designer n'a pas renoncé à son droit moral par une clause contractuelle"],
+   a:1,e:"Le principe de spécialité (art. L131-3 CPI) est fondamental : toute cession de droits doit préciser les droits cédés, la durée, le territoire et les modes d'exploitation autorisés. Tout usage non expressément prévu dans le contrat reste propriété de l'auteur et nécessite une nouvelle autorisation et une nouvelle rémunération."},
+
+  {id:114,t:"da",d:"m",
+   q:"Une créatrice souhaite utiliser librement et gratuitement les affiches de l'affichiste Cassandre pour une exposition. Ces oeuvres sont-elles dans le domaine public, et que reste-t-il à respecter même si la protection patrimoniale est expirée ?",
+   o:["Oui, toutes les oeuvres antérieures à 1950 sont librement utilisables sans restriction","Oui, si 70 ans se sont écoulés depuis la mort de l'auteur, les oeuvres peuvent être librement reproduites, mais les droits moraux (paternité, intégrité) demeurent perpétuels","Non, le domaine public n'existe pas en France, toutes les oeuvres restent protégées indéfiniment","Oui, une fois dans le domaine public, aucun droit n'est plus opposable à personne"],
+   a:1,e:"Une oeuvre entre dans le domaine public 70 ans après la mort de l'auteur : elle devient librement utilisable sans autorisation ni rémunération. Cependant, les droits moraux (droit à la paternité = citer le nom de l'auteur, droit à l'intégrité = ne pas déformer l'oeuvre) restent perpétuels et doivent toujours être respectés."},
+
+  {id:115,t:"da",d:"m",
+   q:"Un artiste plasticien détourne de manière satirique et humoristique une affiche de campagne électorale d'un parti politique. Cet usage non autorisé est-il couvert par une exception légale ?",
+   o:["Non, tout usage satirique d'une oeuvre protégée requiert l'autorisation préalable de son auteur","Oui, l'exception de parodie permet ce type de détournement à condition que la parodie soit clairement reconnaissable comme telle et ne soit pas confondue avec l'oeuvre originale","Oui, toute oeuvre politique ou de communication institutionnelle est librement parodiable","Non, sauf si l'usage est strictement non commercial et n'est pas diffusé publiquement"],
+   a:1,e:"L'exception de parodie, pastel ou caricature (art. L122-5 CPI) permet un détournement d'oeuvre protégée sans autorisation, à deux conditions : la parodie doit être clairement reconnaissable comme telle (pas de confusion avec l'original) et elle ne doit pas porter une atteinte injustifiée aux intérêts légitimes de l'auteur."},
+
+  {id:116,t:"ma",d:"f",
+   q:"Une agence de design dépose une marque à l'INPI pour son logo et sa dénomination sociale. Quelle est la durée de protection initiale de cette marque, et comment cette protection peut-elle être maintenue dans le temps ?",
+   o:["5 ans, renouvelables par tranches de 5 ans indéfiniment","10 ans à compter de la date du dépôt, renouvelables indéfiniment par tranches de 10 ans moyennant paiement des redevances","20 ans non renouvelables, comme un brevet d'invention","70 ans après le décès du fondateur de l'agence, comme le droit d'auteur"],
+   a:1,e:"Une marque déposée à l'INPI est protégée pendant 10 ans à compter de la date de dépôt. Cette protection peut être renouvelée indéfiniment par périodes de 10 ans, à condition de payer les redevances de renouvellement et d'exploiter effectivement la marque."},
+
+  {id:117,t:"ma",d:"f",
+   q:"Un studio de design souhaite déposer le nom et le logo de sa nouvelle identité de marque en France. Auprès de quelle organisation nationale doit-il effectuer ce dépôt, et quelle organisation équivalente couvre l'ensemble des pays de l'UE ?",
+   o:["La Chambre de Commerce et d'Industrie pour la France / la BCE pour l'Europe","L'INPI (Institut National de la Propriété Industrielle) pour la France / l'EUIPO pour les marques de l'Union européenne","Le greffe du tribunal de commerce pour la France / le Parlement européen pour l'Europe","La DGCCRF pour la France / Interpol pour les droits internationaux"],
+   a:1,e:"En France, les marques, brevets, dessins et modèles sont déposés à l'INPI. Pour une protection dans les 27 États membres de l'UE en une seule démarche, le dépôt se fait auprès de l'EUIPO (Office de l'UE pour la Propriété Intellectuelle), basé à Alicante en Espagne."},
+
+  {id:118,t:"ma",d:"f",
+   q:"Un créateur souhaite déposer la marque \"Eau Fraîche\" pour commercialiser une nouvelle eau minérale. L'INPI peut-il refuser cet enregistrement ? Sur quel fondement ?",
+   o:["Non, tout signe peut être déposé comme marque dès lors qu'il est original et inédit","Oui, car un signe purement descriptif des caractéristiques du produit ne peut constituer une marque valide — il doit être distinctif","Oui, mais uniquement si une marque identique existe déjà dans la même classe","Non, seuls les signes contraires à l'ordre public peuvent être refusés"],
+   a:1,e:"Une marque valide doit être DISTINCTIVE : elle ne doit pas décrire directement la nature, la qualité ou les caractéristiques du produit. \"Eau Fraîche\" est descriptif pour une eau minérale → refus. En revanche, \"Evian\" ou \"Badoit\" sont distinctifs car ils n'évoquent pas directement les propriétés du produit."},
+
+  {id:119,t:"ma",d:"m",
+   q:"Une marque de vêtements de sport est déposée dans la classe 25 (habillement) du classement de Nice. Un concurrent lance une gamme d'équipements sportifs en utilisant exactement le même nom dans la classe 28 (jeux et jouets). La première marque peut-elle s'y opposer ?",
+   o:["Oui, car une marque protège son titulaire contre tout usage de signes identiques ou similaires, dans toutes les classes","Non, sauf si la marque est notoire : en vertu du principe de spécialité, la protection d'une marque ordinaire ne vaut que pour les classes où elle a été enregistrée","Oui, car les classes 25 et 28 sont proches et créent un risque de confusion","Non, chaque classe constitue une protection totalement indépendante, sans possibilité d'action croisée"],
+   a:1,e:"Le principe de spécialité est fondamental en droit des marques : la protection ne vaut que pour les classes de produits/services expressément désignées lors du dépôt (parmi les 45 classes du classement de Nice). Exception : les marques notoires (Apple, Nike) bénéficient d'une protection élargie hors de leurs classes."},
+
+  {id:120,t:"ma",d:"m",
+   q:"Une marque déposée à l'INPI n'a pas été exploitée commercialement depuis 6 ans par son titulaire. Un concurrent souhaite s'en emparer. Quelle procédure peut-il engager et quand ?",
+   o:["Il peut demander la déchéance de la marque dès lors qu'elle n'a pas été exploitée pendant 5 ans consécutifs sans juste motif","Il peut simplement déposer la même marque, l'ancienneté de la marque abandonnée n'étant plus opposable après 3 ans","Il peut demander l'annulation de la marque pour defaut d'originalité","Il ne peut rien faire, le titulaire de la marque reste propriétaire même sans exploitation"],
+   a:0,e:"La déchéance pour non-usage : toute personne intéressée peut demander en justice la déchéance des droits du titulaire si la marque n'a pas fait l'objet d'un usage sérieux pendant une période continue de 5 ans, sans juste motif. C'est une sanction de l'abandon de marque."},
+
+  {id:121,t:"ma",d:"m",
+   q:"Une start-up française en forte croissance souhaite protéger sa marque dans toute l'Europe. Plutôt que de déposer la marque dans chacun des 27 États membres séparément, quelle solution lui permettrait de le faire en une seule démarche ?",
+   o:["Déposer la marque à l'INPI en France puis activer une extension automatique UE","Déposer une marque de l'Union européenne (UE) directement auprès de l'EUIPO à Alicante — protection immédiate dans les 27 États membres","Déposer via l'OMPI une demande internationale désignant tous les pays européens","Il n'existe pas de procédure unifiée : chaque pays requiert un dépôt national séparé"],
+   a:1,e:"La marque de l'Union européenne (MUE) est déposée directement auprès de l'EUIPO (Office de l'UE pour la Propriété Intellectuelle, basé à Alicante). Un seul dépôt confère une protection uniforme dans les 27 États membres de l'UE, pour une durée de 10 ans renouvelables."},
+
+  {id:122,t:"ma",d:"m",
+   q:"Un designer créatif conçoit pour son client un logo dont la forme et les couleurs ressemblent fortement à une marque déposée active dans le même secteur. Quels risques juridiques encourt concrètement ce designer ou son client ?",
+   o:["Aucun risque si les logos ne sont pas strictement identiques — seule l'identité totale est sanctionnée","Le titulaire de la marque déposée peut engager une action en contrefaçon ou en concurrence déloyale, pouvant mener à des dommages et intérêts et une interdiction d'usage","Seule une amende administrative de l'INPI peut être prononcée dans ce cas","Le risque est limité à un simple avertissement du titulaire de la marque, sans suite judiciaire possible"],
+   a:1,e:"La contrefaçon de marque couvre non seulement la reproduction à l'identique, mais aussi l'imitation d'une marque déposée créant un risque de confusion dans l'esprit du public. Il est donc indispensable pour tout designer de rechercher les antériorités (via l'INPI ou l'EUIPO) avant de créer un logo pour un client."},
+
+  {id:123,t:"ma",d:"h",
+   q:"Un studio crée un logo original pour une entreprise cliente. Le directeur créatif pense protéger ce logo à la fois par le droit d'auteur et par le dépôt d'une marque. Ces deux protections sont-elles compatibles ? Quelles différences les distinguent ?",
+   o:["Elles sont incompatibles : on ne peut protéger un logo que par l'une ou l'autre des voies, jamais les deux simultanément","Elles sont cumulables et complémentaires : droit d'auteur (automatique, 70 ans post-mortem, originalité requise) et marque (dépôt obligatoire, 10 ans renouvelables, distinctivité requise, protection par classe sectorielle)","Elles sont identiques dans leurs conditions d'acquisition et leurs effets","Le droit d'auteur s'applique au dessin du logo, la marque s'applique uniquement au texte associé"],
+   a:1,e:"Un logo peut cumuler les deux protections : droit d'auteur (automatique dès création si original, 70 ans post-mortem) + marque déposée (dépôt INPI/EUIPO obligatoire, 10 ans renouvelables, protection par classes sectorielles, distinctivité requise). Cette double protection est recommandée car elles couvrent des aspects complémentaires."},
+
+  {id:124,t:"ma",d:"h",
+   q:"La marque \"Chanel\" est utilisée par une petite entreprise artisanale pour commercialiser des bougies parfumées — produit très éloigné du secteur de la mode et du luxe. La maison Chanel peut-elle s'y opposer malgré la règle de spécialité des marques ?",
+   o:["Non, le principe de spécialité s'applique strictement : Chanel n'est pas déposée dans la classe des bougies","Oui, car \"Chanel\" est une marque notoire connue d'une large fraction du public, ce qui lui confère une protection étendue bien au-delà de ses classes d'enregistrement","Non, Chanel devrait d'abord déposer sa marque dans la classe des bougies","Oui, mais uniquement si l'usage de la marque est malveillant ou crée une confusion directe"],
+   a:1,e:"Les marques notoires (reconnues par une large fraction du public, ex. Chanel, Apple, Nike, Hermès) bénéficient d'une protection élargie hors de leurs classes d'enregistrement. Cette protection renforcée vise à éviter la dilution de la marque ou le parasitisme, même dans des secteurs très différents."},
+
+  {id:125,t:"dm",d:"f",
+   q:"Une étudiante en design industriel crée un nouveau modèle de chaise caractérisé par une forme organique distinctive, des couleurs spécifiques et une texture de surface reconnaissable. Qu'est-ce qu'un dessin ou modèle au sens du droit de la propriété industrielle ?",
+   o:["Un plan technique détaillé décrivant le fonctionnement d'un mécanisme ou d'un procédé industriel","L'apparence visuelle et esthétique extérieure d'un produit, caractérisée par ses lignes, couleurs, formes, textures, matériaux ou ornements","Une illustration ou oeuvre graphique destinée à être reproduite en série sur des supports imprimés","Un logotype ou une marque figurative identifiant l'entreprise productrice"],
+   a:1,e:"Un dessin ou modèle protège l'APPARENCE VISUELLE EXTÉRIEURE d'un produit (et non sa fonction ou son procédé technique, qui relève du brevet). Il couvre les lignes, contours, couleurs, formes, textures, matériaux et ornements. Exemples : meuble, emballage, vêtement, interface utilisateur, motif textile."},
+
+  {id:126,t:"dm",d:"f",
+   q:"Un designer dépose un dessin ou modèle à l'INPI pour protéger l'apparence d'un nouveau produit. Quelle est la durée maximale de protection que cette démarche peut lui offrir ?",
+   o:["10 ans non renouvelables","20 ans maximum, renouvelable par tranches de 5 ans","25 ans maximum, par périodes de 5 ans renouvelables 4 fois","70 ans après le décès du créateur, comme le droit d'auteur"],
+   a:2,e:"La protection par dessin ou modèle déposé dure 5 ans à compter du dépôt, renouvelable 4 fois par périodes de 5 ans, soit une durée maximale de 25 ans. Au-delà, le design entre dans le domaine public et peut être librement copié."},
+
+  {id:127,t:"dm",d:"m",
+   q:"Un créateur souhaite déposer son dessin ou modèle pour bénéficier de la protection juridique maximale. Quelles sont les deux conditions cumulatives que son design doit satisfaire pour être protégeable ?",
+   o:["Originalité (empreinte de la personnalité du créateur) et ancienneté (design existant depuis au moins 1 an)","Nouveauté (aucun design identique n'a été antérieurement divulgué) et caractère propre (l'impression visuelle globale diffère de celle des designs antérieurs sur l'utilisateur averti)","Dépôt préalable et paiement intégral des redevances de protection","Utilisation commerciale effective du design et publication dans un catalogue professionnel"],
+   a:1,e:"Pour être protégeable par dépôt : (1) NOUVEAUTÉ : aucun design identique n'a été divulgué avant la date du dépôt ou de priorité ; (2) CARACTÈRE PROPRE : l'impression visuelle globale produite sur l'utilisateur averti diffère de celle de tout design antérieur. Ces deux conditions sont cumulatives."},
+
+  {id:128,t:"dm",d:"m",
+   q:"Un studio de design présente un nouveau concept de montre-bracelet lors d'un salon professionnel en octobre 2024, sans avoir encore déposé de dessin ou modèle. Une protection automatique existe-t-elle, et pour quelle durée ?",
+   o:["Non, sans dépôt préalable, aucune protection n'existe pour les dessins et modèles en Europe","Oui, le design bénéficie d'une protection automatique de 3 ans en tant que dessin ou modèle communautaire non enregistré (DMCNE), dès la première divulgation publique sur le territoire de l'UE","Oui, une protection de 5 ans est accordée automatiquement pour tout design divulgué dans un salon professionnel","Non, mais la date du salon constitue une preuve de priorité pour le dépôt ultérieur"],
+   a:1,e:"Le Dessin ou Modèle Communautaire Non Enregistré (DMCNE) offre une protection automatique de 3 ans dès la première divulgation publique dans l'UE. Cette protection est cependant limitée aux actes de copie intentionnelle — contrairement au design enregistré qui protège même contre les créations indépendantes similaires."},
+
+  {id:129,t:"dm",d:"m",
+   q:"Un designer présente son concept de luminaire lors d'un salon international en mars 2025. Ayant oublié de déposer son dessin ou modèle avant, peut-il encore le faire après le salon sans que la protection soit compromise par cette divulgation ?",
+   o:["Non, toute divulgation publique préalable au dépôt détruit irrémédiablement la nouveauté du design et empêche toute protection","Oui, les salons professionnels sont confidentiels par nature et la divulgation n'est pas opposable","Oui, un délai de grâce de 12 mois s'applique en Europe : la divulgation par le créateur lui-même dans l'année précédant le dépôt ne détruit pas la nouveauté","Oui, si aucun concurrent n'a photographié ni copié le design lors du salon"],
+   a:2,e:"La réglementation européenne sur les dessins et modèles prévoit un délai de grâce de 12 mois : la divulgation réalisée par le créateur lui-même (ou avec son accord) dans les 12 mois précédant la date de dépôt ne peut pas lui être opposée pour invoquer l'absence de nouveauté. Ce délai protège les créateurs qui présentent leurs travaux avant de les déposer."},
+
+  {id:130,t:"dm",d:"h",
+   q:"Un objet de design (lampe, meuble, accessoire) peut-il être protégé simultanément par le droit d'auteur et par le dépôt de dessin ou modèle ? En quoi ces deux protections se distinguent-elles et se complètent-elles ?",
+   o:["Non, le droit français interdit le cumul des protections pour un même objet : il faut choisir l'une ou l'autre","Oui, le principe de l'unité de l'art permet ce cumul : droit d'auteur (automatique, originalité, 70 ans post-mortem) + dessin/modèle déposé (nouveauté + caractère propre, 25 ans max). Les conditions et la durée de protection diffèrent.","Oui, mais le droit d'auteur ne protège que la fonction esthétique, le dessin/modèle protège la forme industrielle","Non, seul le dessin ou modèle peut protéger les créations ayant une application industrielle"],
+   a:1,e:"En France, la théorie de l'unité de l'art (L. 112-1 CPI) permet le cumul des protections. Droit d'auteur : automatique, condition d'originalité, 70 ans post-mortem. Dessin/modèle : dépôt obligatoire, conditions de nouveauté + caractère propre, 25 ans max. Un même objet peut bénéficier des deux protections, qui se complètent dans leurs conditions et leur durée."},
+
+  {id:131,t:"ct",d:"f",
+   q:"Une illustratrice signe avec un éditeur un contrat aux termes duquel elle transfère définitivement à ce dernier ses droits de reproduction et de distribution sur ses illustrations. De quel type d'acte juridique s'agit-il ?",
+   o:["Une licence d'utilisation temporaire accordée à l'éditeur pour une durée déterminée","Une cession de droits d'auteur, par laquelle elle transfère définitivement et contractuellement ses droits patrimoniaux à l'éditeur","Un mandat de gestion des droits confié à l'éditeur en tant que représentant","Un contrat de commande donnant à l'éditeur la propriété des illustrations commandées"],
+   a:1,e:"La cession de droits d'auteur est un transfert DÉFINITIF des droits patrimoniaux de l'auteur à un cessionnaire, contre rémunération. Elle doit obligatoirement être écrite et préciser les droits cédés, la durée, le territoire, les modes d'exploitation et la rémunération. À distinguer de la licence, qui n'est qu'une autorisation temporaire."},
+
+  {id:132,t:"ct",d:"f",
+   q:"Un photographe autorise un magazine à publier ses photos pour une durée de 2 ans, sur support papier uniquement, en conservant tous ses droits d'auteur. De quel contrat s'agit-il et quelle en est la caractéristique essentielle ?",
+   o:["Une cession de droits : le magazine acquiert définitivement tous les droits sur les photos","Une licence d'utilisation : le photographe accorde une autorisation d'exploiter son oeuvre dans des conditions précises, sans transfert de la propriété de ses droits","Un contrat de commande photographique avec droit de cession implicite","Un contrat de prestation de services standard sans spécificité en matière de droits d'auteur"],
+   a:1,e:"La licence d'utilisation est une autorisation d'exploiter une oeuvre selon des conditions précisément définies (durée, territoire, support, mode d'exploitation). L'auteur reste propriétaire de ses droits d'auteur. C'est une autorisation, pas un transfert de propriété — contrairement à la cession."},
+
+  {id:133,t:"ct",d:"m",
+   q:"Un designer freelance et son client concluent oralement un accord sur la cession de droits d'utilisation d'une identité visuelle. Cet accord verbal est-il juridiquement valide en droit français ?",
+   o:["Oui, un accord oral est aussi valable qu'un contrat écrit et produit les mêmes effets juridiques","Non, la cession de droits d'auteur doit obligatoirement être formalisée par écrit et préciser les droits cédés, la durée, le territoire, le mode d'exploitation et la rémunération","Non, mais il peut être régularisé ultérieurement par un simple email de confirmation","Oui, si le montant de la cession est inférieur à 1 500 €"],
+   a:1,e:"L'article L131-3 du Code de la Propriété Intellectuelle impose que la cession des droits d'auteur soit écrite et précise : (1) les droits cédés, (2) la durée, (3) le territoire, (4) le mode d'exploitation autorisé, (5) la rémunération. Toute mention absente signifie que le droit correspondant n'est pas cédé et reste chez l'auteur."},
+
+  {id:134,t:"ct",d:"m",
+   q:"Un illustrateur signe un contrat de cession qui ne précise ni la durée de la cession ni les territoires couverts. Le client prétend que l'absence de ces précisions lui confère une liberté totale d'utilisation. Cette interprétation est-elle correcte ?",
+   o:["Oui, une cession sans restriction de durée et de territoire vaut cession mondiale et perpétuelle","Non, en vertu du principe de spécialité : les droits non expressément cédés restent chez l'auteur, et les ambiguïtés du contrat s'interprètent en faveur de l'auteur","Oui, les usages professionnels comblent les lacunes contractuelles dans le secteur créatif","Non, mais le client peut invoquer la bonne foi pour justifier un usage étendu"],
+   a:1,e:"Le principe de spécialité (art. L131-3 CPI) est protecteur de l'auteur : toute clause imprécise ou lacunaire s'interprète en faveur de l'auteur. Un droit non expressément mentionné dans le contrat est réputé non cédé. L'absence de durée et de territoire ne vaut pas cession mondiale et perpétuelle."},
+
+  {id:135,t:"ct",d:"m",
+   q:"Un graphiste a créé une affiche pour la campagne de communication d'un restaurant en 2023. En 2025, le restaurant souhaite réutiliser cette affiche pour l'ouverture d'un second restaurant. Peut-il le faire sans contacter le graphiste, en invoquant qu'il a déjà payé pour la création ?",
+   o:["Oui, dès lors qu'il a payé intégralement la prestation initiale, le client peut réutiliser l'oeuvre à sa guise","Non, le paiement de la commande n'emporte pas cession automatique des droits. Seul l'usage prévu initialement est autorisé — tout autre usage requiert une nouvelle autorisation et une nouvelle rémunération","Oui, si l'usage est similaire (communication du même restaurant) et sans modification de l'oeuvre","Non, mais un usage ponctuel supplémentaire peut être toléré en dehors de tout contrat"],
+   a:1,e:"Principe fondamental : le paiement d'une commande créative ne transfère PAS automatiquement les droits d'auteur. Le client ne dispose que d'une licence implicite pour l'usage initialement prévu. Pour tout usage supplémentaire (nouveau restaurant, autre support, autre durée), une nouvelle autorisation contractuelle et une rémunération complémentaire sont nécessaires."},
+
+  {id:136,t:"ct",d:"h",
+   q:"Une entreprise de cosmétiques commande à un photographe indépendant une série de photos pour son catalogue. Elle finance entièrement la production (studio, matériel, post-production) et lui verse ses honoraires. L'entreprise affirme être propriétaire des droits sur les photos car elle a tout financé. Cette affirmation est-elle juridiquement fondée en France ?",
+   o:["Oui, le financement intégral de la production transfère automatiquement la propriété des droits d'auteur au donneur d'ordre","Non, en droit français, l'auteur freelance conserve ses droits d'auteur quels que soient le financement et les instructions reçus. Le paiement ≠ transfert de droits — seul un contrat de cession écrit peut opérer ce transfert","Oui, si la commande dépasse 1 000 € et que le photographe a suivi des instructions précises","Cela dépend de la nature du contrat : un contrat de services implique une cession, un contrat d'oeuvre de commande non"],
+   a:1,e:"C'est l'un des pièges les plus fréquents dans les relations créateurs/clients. En France, le financement d'une oeuvre NE transfère PAS les droits d'auteur. Le photographe freelance reste automatiquement auteur et titulaire de ses droits patrimoniaux. Seul un contrat de CESSION EXPRESSE ET ÉCRIT peut transférer ces droits. Cette règle protège les créateurs indépendants."},
+
+  {id:137,t:"ct",d:"h",
+   q:"Un designer freelance signe un contrat de cession de droits pour la création d'un logotype. Pour être valide et complet selon le Code de la Propriété Intellectuelle, quels éléments ce contrat doit-il impérativement préciser ?",
+   o:["Uniquement le prix et la date de livraison de la création finale","Les droits précisément cédés, la durée de la cession, le territoire géographique couvert, la destination (usages autorisés) et la rémunération proportionnelle ou forfaitaire","Le nom complet de l'auteur, sa date de naissance et son numéro SIRET","Le numéro SIRET des deux parties contractantes et le délai de paiement uniquement"],
+   a:1,e:"Art. L131-3 CPI : la cession doit préciser à peine de nullité (1) les droits cédés, (2) la durée, (3) le territoire géographique, (4) la destination/usage autorisé et (5) la rémunération (proportionnelle aux recettes en principe, forfait possible dans des cas limitatifs). Toute mention absente = droit non cédé."},
+
+  {id:138,t:"cf",d:"f",
+   q:"Un concurrent reproduit sur son site internet les visuels du catalogue d'une agence de design sans aucune autorisation. Une marque de streetwear copie à l'identique le logo déposé d'une autre marque. Ces deux situations constituent chacune une infraction. Comment se nomme cette infraction ?",
+   o:["La concurrence déloyale, sanctionnée uniquement par des dommages et intérêts civils","La contrefaçon : toute atteinte à un droit de propriété intellectuelle par reproduction ou exploitation non autorisée d'une oeuvre, marque, brevet ou dessin protégé","La concurrence parasitaire, qui suppose une volonté de profiter de la réputation d'autrui","Le plagiat, terme équivalent à la contrefaçon dans le domaine créatif"],
+   a:1,e:"La contrefaçon (terme juridique) couvre toute violation d'un droit de propriété intellectuelle : reproduction non autorisée d'une oeuvre protégée (droit d'auteur), imitation d'une marque déposée, exploitation non autorisée d'un brevet ou dessin/modèle enregistré. C'est à la fois une infraction civile et pénale."},
+
+  {id:139,t:"cf",d:"m",
+   q:"Un studio de design apprend que l'un de ses logos phares a été massivement copié et commercialisé sans autorisation. Quelle sanction pénale maximale le contrefacteur risque-t-il en France pour un tel acte ?",
+   o:["1 an d'emprisonnement et 100 000 € d'amende au maximum","3 ans d'emprisonnement et 300 000 € d'amende (art. L335-2 CPI) — peines pouvant être aggravées à 5 ans et 500 000 € en cas de circonstances aggravantes","10 ans d'emprisonnement et 1 million € d'amende","5 ans d'emprisonnement et 500 000 € d'amende dans tous les cas"],
+   a:1,e:"La contrefaçon est un délit pénal sanctionné de 3 ans d'emprisonnement et 300 000 € d'amende. Des peines aggravées (5 ans et 500 000 €) s'appliquent en cas de circonstances aggravantes : bande organisée, délinquance en récidive, utilisation d'Internet, travail dissimulé ou livraison à des mineurs."},
+
+  {id:140,t:"cf",d:"m",
+   q:"Un créateur graphique s'inspire fortement du style visuel caractéristique d'un artiste reconnu (palette de couleurs, composition, traitement typographique) mais ne reproduit aucune oeuvre concrète à l'identique. Commet-il une contrefaçon ?",
+   o:["Oui, s'inspirer du style artistique d'un auteur constitue systématiquement une contrefaçon","Non, le style, la manière et les influences artistiques ne sont pas protégés par le droit d'auteur. Seule la reproduction d'éléments originaux et concrets d'une oeuvre peut constituer une contrefaçon","Oui, si les deux créateurs opèrent dans le même secteur professionnel","Non, la liberté de création et d'inspiration est totale et sans limite légale"],
+   a:1,e:"Le style artistique, la manière, les influences ou les \"recettes\" créatives ne sont pas protégeables par le droit d'auteur — sinon, aucune école de pensée ni aucun mouvement artistique ne serait possible. Seules les oeuvres concrètes et originales bénéficient de la protection. S'inspirer = légal. Reproduire des éléments formels originaux spécifiques = contrefaçon potentielle."},
+
+  {id:141,t:"cf",d:"m",
+   q:"Un jeune designer est accusé d'avoir plagié le travail d'un concurrent. Il affirme avoir créé son design bien avant que le concurrent ne publie le sien. Comment peut-il le prouver et devant quelle instance ?",
+   o:["Seul un dépôt officiel à l'INPI antérieur à la création du concurrent fait foi de manière incontestable","La preuve de date de création peut être apportée par tout moyen légal : enveloppe Soleau, constat d'huissier, dépôt horodaté sur une plateforme certifiée, dépôt auprès d'une société d'auteurs (SACD, SCAM)","Seul le témoignage de personnes présentes lors de la création est admis comme preuve","La date de publication sur les réseaux sociaux constitue une preuve juridiquement suffisante"],
+   a:1,e:"La preuve de la date de création peut être apportée par tout moyen : enveloppe Soleau (INPI, peu coûteuse), constat d'huissier, dépôt horodaté sur une plateforme certifiée, dépôt auprès d'une société d'auteurs. Le dépôt n'est pas obligatoire pour être protégé, mais crucial pour prouver l'antériorité en cas de litige."},
+
+  {id:142,t:"cf",d:"h",
+   q:"Un professeur de design confond régulièrement les termes \"plagiat\" et \"contrefaçon\" dans ses cours. Quelle distinction juridique précise peut-on lui opposer pour corriger cette confusion ?",
+   o:["Les deux termes sont rigoureusement synonymes en droit de la propriété intellectuelle et peuvent être utilisés indifféremment","Le plagiat est un concept moral et académique (s'approprier le travail d'autrui sans le citer), tandis que la contrefaçon est le terme juridique désignant la violation d'un droit de PI. Le plagiat d'une oeuvre protégée peut constituer une contrefaçon.","La contrefaçon ne concerne que le droit des marques, le plagiat s'applique uniquement aux oeuvres littéraires et artistiques","Le plagiat est une infraction pénale, la contrefaçon est une faute civile uniquement"],
+   a:1,e:"Plagiat = concept moral/académique. Contrefaçon = terme juridique précis. Un plagiat peut constituer une contrefaçon si l'oeuvre plagiée est protégée par un droit de PI. Mais la contrefaçon s'étend au-delà : elle inclut aussi l'imitation de marques, brevets, dessins/modèles — même sans plagiat au sens académique."},
+
+  {id:143,t:"cf",d:"f",
+   q:"Un étudiant en communication visuelle souhaite utiliser une photo trouvée sur Google Images pour illustrer un projet scolaire diffusé sur le site de son école. Cette image est-elle librement utilisable ?",
+   o:["Oui, toute image accessible sur Internet peut être librement utilisée à des fins éducatives ou non commerciales","Non, les images publiées sur Internet sont protégées par le droit d'auteur dès leur création, sauf si elles sont explicitement placées sous licence libre (Creative Commons, etc.)","Oui, une image est libre de droits si elle n'est pas filigranée ou marquée par son auteur","Oui, pour tout usage non commercial ou scolaire, la loi prévoit une exception générale"],
+   a:1,e:"Toute image publiée sur Internet est protégée par le droit d'auteur dès sa création — aucune formalité requise. La trouver sur Google Images ne la rend pas libre de droits. Il faut vérifier la licence associée ou utiliser des sources libres : Unsplash, Pexels, Pixabay, images sous licence Creative Commons."},
+
+  {id:144,t:"cf",d:"h",
+   q:"Un studio de design constate qu'un concurrent commercialise des produits qui copient à l'identique son packaging déposé comme dessin et modèle. Avant même d'engager une procédure judiciaire au fond, il veut sécuriser les preuves. Quelle procédure préventive très efficace le droit lui offre-t-il ?",
+   o:["Il peut signaler l'infraction à la DGCCRF pour qu'elle effectue un contrôle administratif","La saisie-contrefaçon : procédure civile préventive qui permet au titulaire des droits d'obtenir d'un juge l'autorisation de faire constater et saisir par huissier les preuves de contrefaçon et les produits litigieux, avant tout procès au fond","Il peut saisir directement la police pour une procédure de flagrant délit de contrefaçon","Il peut uniquement envoyer une mise en demeure par lettre recommandée et attendre 30 jours"],
+   a:1,e:"La saisie-contrefaçon est une procédure civile puissante et spécifique à la propriété intellectuelle. Sur ordonnance d'un juge (rendue ex parte, sans entendre le défendeur), un huissier peut pénétrer dans les locaux du contrefacteur pour constater l'infraction, saisir les produits contrefaisants et recueillir les preuves. Ces éléments seront ensuite utilisés lors du procès."},
+
+  {id:145,t:"da",d:"m",
+   q:"Un photographe amateur prend une photo d'une cathédrale gothique et la publie sur son portfolio en ligne. Cette photographie bénéficie-t-elle de la protection du droit d'auteur ?",
+   o:["Non, les photos prises par des amateurs ne sont pas protégées par le droit d'auteur","Oui, si elle traduit des choix esthétiques originaux propres au photographe (cadrage, angle, lumière, moment choisi) — l'empreinte de la personnalité de l'auteur doit être perceptible","Non, les bâtiments et monuments publics appartiennent au domaine public visuel","Oui, toute photographie est automatiquement protégée par le droit d'auteur, sans condition d'originalité"],
+   a:1,e:"Une photographie est protégée si elle est ORIGINALE, c'est-à-dire si elle traduit des choix créatifs propres à son auteur (cadrage, angle de vue, lumière, profondeur de champ, instant choisi). Une photo purement documentaire ou technique, sans choix créatifs personnels, pourrait ne pas satisfaire à la condition d'originalité."},
+
+  {id:146,t:"ma",d:"f",
+   q:"Un designer doit déposer une marque internationale pour son client et doit indiquer les classes de produits et services concernées. Combien de classes comprend le classement international de Nice, sur lequel se base l'INPI ?",
+   o:["10 classes (5 produits + 5 services)","25 classes uniquement pour les produits industriels","45 classes au total : 34 classes de produits et 11 classes de services","100 classes couvrant l'ensemble des secteurs économiques"],
+   a:2,e:"Le classement international de Nice (géré par l'OMPI) comprend 45 classes : 34 classes de produits (classes 1 à 34) et 11 classes de services (classes 35 à 45). Choisir les bonnes classes lors du dépôt d'une marque est stratégique car la protection n'est effective que pour les classes sélectionnées."},
+
+  {id:147,t:"dm",d:"f",
+   q:"Un designer textile a créé un motif original pour une collection de vêtements et souhaite en protéger l'apparence par un dépôt officiel. En France, auprès de quelle organisation ce dépôt doit-il être effectué, et quelle organisation couvre l'ensemble de l'UE ?",
+   o:["Le greffe du tribunal de commerce pour la France / la Cour de justice européenne pour l'UE","L'INPI pour une protection en France / l'EUIPO pour une protection dans l'ensemble de l'Union européenne","La Chambre de Commerce pour la France / le Parlement européen pour l'UE","La DGCCRF pour la France / Europol pour l'UE"],
+   a:1,e:"Les dessins et modèles se déposent à l'INPI pour une protection en France, ou à l'EUIPO (Office de l'UE pour la Propriété Intellectuelle, basé à Alicante) pour une protection dans les 27 États membres de l'UE en une seule démarche."},
+
+  {id:148,t:"ct",d:"h",
+   q:"Un illustrateur cède ses droits de reproduction à un éditeur. L'éditeur lui propose une rémunération forfaitaire unique, sans lien avec les ventes réelles de l'ouvrage. Le Code de la Propriété Intellectuelle autorise-t-il ce mode de rémunération forfaitaire ?",
+   o:["Oui, la rémunération forfaitaire est toujours possible et laissée au libre accord des parties","Non, la loi impose impérativement une rémunération proportionnelle aux recettes d'exploitation dans tous les cas","La rémunération doit en principe être proportionnelle aux recettes d'exploitation, mais un forfait est possible dans des cas limitativement prévus par la loi (logiciels, usage difficile à évaluer, contribution accessoire, etc.)","Le forfait est uniquement possible pour les droits de représentation, jamais pour les droits de reproduction"],
+   a:2,e:"Art. L131-4 CPI : la cession de droits doit en principe être rémunérée proportionnellement aux recettes tirées de l'exploitation de l'oeuvre. Un forfait est exceptionnellement possible dans des cas limitatifs : logiciels, oeuvres dont l'usage est difficile à évaluer, contribution accessoire de l'auteur, etc."},
+
+  {id:149,t:"da",d:"m",
+   q:"Une peintre a créé une série de tableaux qu'elle hésite à exposer. Son galeriste ne peut pas exiger qu'elle les montre au public contre sa volonté. Sur quel droit moral cette protection repose-t-elle ?",
+   o:["Le droit de suite, qui protège l'auteur lors des reventes aux enchères","Le droit de divulgation : l'auteur seul décide si, quand, comment et sous quelle forme son oeuvre sera communiquée au public pour la première fois","Le droit de paternité, qui protège le nom de l'auteur sur son oeuvre","Le droit d'intégrité, qui protège l'oeuvre contre toute modification non autorisée"],
+   a:1,e:"Le droit de divulgation est le droit moral fondamental qui permet à l'auteur de décider souverainement si, quand, comment et dans quelle forme son oeuvre sera rendue publique pour la première fois. Nul ne peut forcer un auteur à divulguer son oeuvre. Ce droit est perpétuel et inaliénable."},
+
+  {id:150,t:"cf",d:"m",
+   q:"Paul scanne intégralement un roman pour le lire sur sa liseuse personnelle sans en distribuer de copie. Est-ce légal au regard de la loi française sur le droit d'auteur ?",
+   o:["Oui, toute reproduction d'une oeuvre est autorisée pour un usage strictement personnel et privé grâce à l'exception de copie privée","Non, toute numérisation d'une oeuvre protégée est une contrefaçon même pour usage privé","Oui, mais uniquement si l'oeuvre est épuisée ou inaccessible commercialement","Non, la loi impose d'acheter une version numérique distincte pour la lire sur une liseuse"],
+   a:0,e:"L'exception de copie privée (art. L122-5 CPI) autorise toute personne à reproduire une oeuvre protégée pour un usage strictement personnel et privé (non collectif, non professionnel). Cette exception est compensée par la redevance pour copie privée perçue sur les supports vierges et appareils numériques."},
+];
+
+// ═══════════════════════════════════════════════
 // CONFIG
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
 const SUBJECTS=[
-  {id:"ent",title:"Entrepreneuriat",sub:"Le Créatif & le Droit",emoji:"⚖️",color:"#C9A84C",bg:"linear-gradient(180deg,#251E08,#0D0D12)",
+  {id:"ent",title:"Entrepreneuriat",sub:"Le Créatif & le Droit",emoji:"⚖️",color:"#C9A84C",gfrom:"#C9A84C",gto:"#E0A030",
    themes:[{id:"ei",label:"Entreprise individuelle",emoji:"🏢",color:"#E97F3A"},{id:"me",label:"Micro-entreprise",emoji:"🛒",color:"#2D9B6E"},{id:"aa",label:"Artiste-auteur",emoji:"🎨",color:"#9B5DE5"},{id:"sc",label:"Création de société",emoji:"⚖️",color:"#2B7EE0"}],
    questions:ENT_Q},
-  {id:"des",title:"Droit du Design",sub:"Propriété intellectuelle",emoji:"🖊️",color:"#E97F3A",bg:"linear-gradient(180deg,#251008,#0D0D12)",
-   themes:[{id:"da",label:"Droit d'auteur",emoji:"✍️",color:"#E97F3A"},{id:"ma",label:"Marques",emoji:"™",color:"#E0344A"},{id:"dm",label:"Dessins & Modèles",emoji:"📐",color:"#2B7EE0"},{id:"ct",label:"Contrats",emoji:"📝",color:"#2D9B6E"},{id:"cf",label:"Contrefaçon",emoji:"⚠️",color:"#9B5DE5"}],
+  {id:"des",title:"Droit du Design",sub:"Propriété intellectuelle",emoji:"🖊️",color:"#4F46E5",gfrom:"#4F46E5",gto:"#7C3AED",
+   themes:[{id:"da",label:"Droit d'auteur",emoji:"✍️",color:"#4F46E5"},{id:"ma",label:"Marques",emoji:"™",color:"#E0344A"},{id:"dm",label:"Dessins & Modèles",emoji:"📐",color:"#2B7EE0"},{id:"ct",label:"Contrats",emoji:"📝",color:"#2D9B6E"},{id:"cf",label:"Contrefaçon",emoji:"⚠️",color:"#9B5DE5"}],
    questions:DES_Q},
 ];
 const BADGES=[
-  {id:"first",emoji:"👶",label:"Premier pas",check:(d,s)=>d.totalSessions>=1},
-  {id:"perfect",emoji:"💯",label:"Sans faute",check:(d,s)=>s.some(r=>r.score===r.total&&r.total>=5)},
-  {id:"streak3",emoji:"🔥",label:"En feu",check:(d,s)=>d.streak>=3},
-  {id:"study20",emoji:"📚",label:"Bosseur",check:(d,s)=>d.totalSessions>=20},
-  {id:"exp_ent",emoji:"⚖️",label:"Expert Entrepreneuriat",check:(d,s)=>{const ss=s.filter(r=>r.sub==="ent");return ss.length>=5&&ss.reduce((a,r)=>a+r.score/r.total,0)/ss.length>=0.8;}},
-  {id:"exp_des",emoji:"🎨",label:"Expert Design",check:(d,s)=>{const ss=s.filter(r=>r.sub==="des");return ss.length>=5&&ss.reduce((a,r)=>a+r.score/r.total,0)/ss.length>=0.8;}},
-  {id:"poly",emoji:"🌟",label:"Polyvalent",check:(d,s)=>SUBJECTS.every(sub=>s.filter(r=>r.sub===sub.id).length>=3)},
+  {id:"first",emoji:"👶",label:"Premier pas",desc:"Compléter une première session",check:(d,s)=>d.totalSessions>=1},
+  {id:"perfect",emoji:"💯",label:"Sans faute",desc:"Score parfait sur 5 questions min.",check:(d,s)=>s.some(r=>r.score===r.total&&r.total>=5)},
+  {id:"streak3",emoji:"🔥",label:"En feu",desc:"3 jours consécutifs à 70 %+",check:(d,s)=>d.streak>=3},
+  {id:"study20",emoji:"📚",label:"Bosseur",desc:"20 sessions complétées",check:(d,s)=>d.totalSessions>=20},
+  {id:"exp_ent",emoji:"⚖️",label:"Expert Entrepreneuriat",desc:"5 sessions Entrepreneuriat à 80 %+ en moyenne",check:(d,s)=>{const ss=s.filter(r=>r.sub==="ent");return ss.length>=5&&ss.reduce((a,r)=>a+r.score/r.total,0)/ss.length>=0.8;}},
+  {id:"exp_des",emoji:"🎨",label:"Expert Design",desc:"5 sessions Droit du Design à 80 %+ en moyenne",check:(d,s)=>{const ss=s.filter(r=>r.sub==="des");return ss.length>=5&&ss.reduce((a,r)=>a+r.score/r.total,0)/ss.length>=0.8;}},
+  {id:"poly",emoji:"🌟",label:"Polyvalent",desc:"3 sessions dans chaque matière",check:(d,s)=>SUBJECTS.every(sub=>s.filter(r=>r.sub===sub.id).length>=3)},
 ];
 const LEVELS=[{min:0,label:"Débutant",emoji:"🌱"},{min:150,label:"Apprenti",emoji:"📖"},{min:400,label:"Confirmé",emoji:"⭐"},{min:800,label:"Expert",emoji:"🎯"},{min:1500,label:"Maître",emoji:"🏆"}];
-const DIFF_C={f:"#2D9B6E",m:"#E97F3A",h:"#E0344A",x:"#2B7EE0"};
-const DIFF_L={f:"Facile",m:"Moyen",h:"Difficile",x:"Mixte"};
+const DC={f:"#10B981",m:"#F59E0B",h:"#EF4444",x:"#6366F1"};
+const DL={f:"Facile",m:"Moyen",h:"Difficile",x:"Mixte"};
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // STATE & PERSISTENCE
-// ═══════════════════════════════════════════
-const DEFAULT={xp:0,streak:0,lastDate:"",totalSessions:0,badges:[],sessions:[],subs:{ent:{seenIds:[],themeStats:{}},des:{seenIds:[],themeStats:{}}}};
+// ═══════════════════════════════════════════════
+const DEF={xp:0,streak:0,lastDate:"",totalSessions:0,badges:[],sessions:[],subs:{ent:{seenIds:[],themeStats:{}},des:{seenIds:[],themeStats:{}}}};
 let D=loadData();
 let S={screen:"hub",sub:null,cfg:{themes:[],diff:"m",count:7},qs:[],cur:0,sel:null,rev:false,ans:[],newBadges:[],earned:0};
 
-function loadData(){try{const r=localStorage.getItem("trainer_v2");if(r)return{...JSON.parse(JSON.stringify(DEFAULT)),...JSON.parse(r)};}catch(e){}return JSON.parse(JSON.stringify(DEFAULT));}
-function saveData(){try{localStorage.setItem("trainer_v2",JSON.stringify(D));}catch(e){}}
+function loadData(){try{const r=localStorage.getItem("trainer_v3");if(r)return{...JSON.parse(JSON.stringify(DEF)),...JSON.parse(r)};}catch(e){}return JSON.parse(JSON.stringify(DEF));}
+function saveData(){try{localStorage.setItem("trainer_v3",JSON.stringify(D));}catch(e){}}
+function initFavicon(){
+  const c=document.createElement("canvas");c.width=c.height=192;const ctx=c.getContext("2d");
+  const g=ctx.createLinearGradient(0,0,192,192);g.addColorStop(0,"#4F46E5");g.addColorStop(1,"#7C3AED");
+  ctx.fillStyle=g;ctx.beginPath();ctx.roundRect(0,0,192,192,40);ctx.fill();
+  ctx.fillStyle="rgba(255,255,255,0.15)";ctx.beginPath();ctx.arc(130,50,70,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="white";ctx.font="bold 96px DM Sans,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("E",96,100);
+  const url=c.toDataURL();
+  ["icon","apple-touch-icon","shortcut icon"].forEach(rel=>{const l=document.createElement("link");l.rel=rel;l.href=url;document.head.appendChild(l);});
+}
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // UTILS
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
 function h(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function getLv(xp){return[...LEVELS].reverse().find(l=>xp>=l.min)||LEVELS[0];}
 function getNextLv(xp){return LEVELS.find(l=>l.min>xp);}
 function pct(n,t){return t>0?Math.round(n/t*100):0;}
-function avg(arr){return arr.length>0?Math.round(arr.reduce((s,x)=>s+x,0)/arr.length):0;}
-
+function scoreColor(p){return p>=70?"#10B981":p>=50?"#F59E0B":"#EF4444";}
 function selectQ(sub,cfg){
-  let pool=sub.questions.filter(q=>{
-    if(!cfg.themes.includes(q.t))return false;
-    if(cfg.diff!=="x"&&q.d!==cfg.diff)return false;
-    return true;
-  });
+  let pool=sub.questions.filter(q=>{if(!cfg.themes.includes(q.t))return false;if(cfg.diff!=="x"&&q.d!==cfg.diff)return false;return true;});
   if(!pool.length)pool=sub.questions.filter(q=>cfg.themes.includes(q.t));
   const sd=D.subs[sub.id]||{seenIds:[],themeStats:{}};
-  const scored=pool.map(q=>{
-    const key=sub.themes.find(t=>t.id===q.t)?.label||q.t;
-    const ts=sd.themeStats[key]||{correct:0,total:0};
-    const weak=ts.total>0?1-(ts.correct/ts.total)*0.5:0.8;
-    const fresh=sd.seenIds.includes(q.id)?0.3:1;
-    return{q,score:fresh*weak+Math.random()*0.25};
-  });
+  const scored=pool.map(q=>{const key=sub.themes.find(t=>t.id===q.t)?.label||q.t;const ts=sd.themeStats[key]||{correct:0,total:0};const weak=ts.total>0?1-(ts.correct/ts.total)*0.5:0.8;const fresh=sd.seenIds.includes(q.id)?0.3:1;return{q,score:fresh*weak+Math.random()*0.25};});
   return scored.sort((a,b)=>b.score-a.score).slice(0,cfg.count).map(s=>s.q).sort(()=>Math.random()-.5);
 }
+function getWeakTheme(){let worst=null,worstPct=1;SUBJECTS.forEach(sub=>{const sd=D.subs[sub.id]||{seenIds:[],themeStats:{}};sub.themes.forEach(t=>{const ts=sd.themeStats[t.label];if(ts&&ts.total>=4){const p=ts.correct/ts.total;if(p<worstPct){worstPct=p;worst={sub,themeId:t.id,label:t.label,pct:Math.round(p*100)};}}});});return worst;}
 
-function getWeakTheme(){
-  let worst=null,worstPct=1;
-  SUBJECTS.forEach(sub=>{
-    const sd=D.subs[sub.id]||{seenIds:[],themeStats:{}};
-    sub.themes.forEach(t=>{
-      const ts=sd.themeStats[t.label];
-      if(ts&&ts.total>=4){const p=ts.correct/ts.total;if(p<worstPct){worstPct=p;worst={sub,themeId:t.id,label:t.label,pct:Math.round(p*100)};}}
-    });
-  });
-  return worst;
+// ═══════════════════════════════════════════════
+// THEME TOGGLE
+// ═══════════════════════════════════════════════
+function initTheme(){
+  document.documentElement.dataset.theme="dark";
+  document.getElementById("theme-color-meta").content="#0D0D12";
 }
+window.toggleMode=function(){};
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // NAVIGATION
-// ═══════════════════════════════════════════
-function go(screen){
-  const app=document.getElementById("app");
-  app.classList.add("fading");
-  setTimeout(()=>{S.screen=screen;render();app.classList.remove("fading");app.scrollTop=0;},180);
-}
+// ═══════════════════════════════════════════════
+function go(screen){const app=document.getElementById("app");app.classList.add("fading");setTimeout(()=>{S.screen=screen;render();app.classList.remove("fading");app.scrollTop=0;},180);}
 
-// ═══════════════════════════════════════════
-// ACTIONS (global, called from HTML)
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════
 window.openSubject=function(id){S.sub=SUBJECTS.find(s=>s.id===id);S.cfg={themes:S.sub.themes.map(t=>t.id),diff:"m",count:7};go("subject");};
 window.startSession=function(){S.qs=selectQ(S.sub,S.cfg);S.cur=0;S.sel=null;S.rev=false;S.ans=[];go("quiz");};
-window.selectAnswer=function(idx){
-  if(S.rev)return;
-  S.sel=idx;S.rev=true;
-  render(); // no transition, just re-render
-};
+window.selectAnswer=function(idx){if(S.rev)return;S.sel=idx;S.rev=true;render();};
 window.nextQuestion=function(){
-  const q=S.qs[S.cur];
-  const ok=S.sel===q.a;
-  S.ans.push({theme:q.t,qid:q.id,correct:ok});
-  if(S.cur+1<S.qs.length){
-    const qc=document.getElementById("qcard");
-    if(qc){qc.style.transition="opacity .15s,transform .15s";qc.style.opacity="0";qc.style.transform="translateX(12px)";}
-    setTimeout(()=>{S.cur++;S.sel=null;S.rev=false;render();},170);
-  } else{finishSession();}
+  const q=S.qs[S.cur];const ok=S.sel===q.a;S.ans.push({theme:q.t,qid:q.id,correct:ok});
+  if(S.cur+1<S.qs.length){const qc=document.getElementById("qcard");if(qc){qc.style.transition="opacity .15s,transform .15s";qc.style.opacity="0";qc.style.transform="translateX(14px)";}setTimeout(()=>{S.cur++;S.sel=null;S.rev=false;render();},170);}
+  else{finishSession();}
 };
-window.toggleTheme=function(tid){
-  const t=S.cfg.themes;
-  if(t.includes(tid)&&t.length>1)S.cfg.themes=t.filter(x=>x!==tid);
-  else if(!t.includes(tid))S.cfg.themes=[...t,tid];
-  render();
-};
+window.toggleTheme=function(tid){const t=S.cfg.themes;if(t.includes(tid)&&t.length>1)S.cfg.themes=t.filter(x=>x!==tid);else if(!t.includes(tid))S.cfg.themes=[...t,tid];render();};
 window.setDiff=function(d){S.cfg.diff=d;render();};
 window.setCount=function(n){S.cfg.count=n;render();};
 window.goHub=function(){go("hub");};
 window.goSubject=function(){go("subject");};
-window.resetStats=function(){if(confirm("Réinitialiser toutes vos statistiques ?\n\nCette action est irréversible.")){D=JSON.parse(JSON.stringify(DEFAULT));saveData();go("hub");}};
-window.quickWeakPoint=function(){
-  const w=getWeakTheme();if(!w)return;
-  S.sub=w.sub;S.cfg={themes:[w.themeId],diff:"x",count:7};
-  S.qs=selectQ(S.sub,S.cfg);S.cur=0;S.sel=null;S.rev=false;S.ans=[];go("quiz");
-};
+window.resetStats=function(){if(confirm("Réinitialiser toutes vos statistiques ?\n\nCette action est irréversible.")){D=JSON.parse(JSON.stringify(DEF));saveData();go("hub");}};
+window.quickWeakPoint=function(){const w=getWeakTheme();if(!w)return;S.sub=w.sub;S.cfg={themes:[w.themeId],diff:"x",count:7};S.qs=selectQ(S.sub,S.cfg);S.cur=0;S.sel=null;S.rev=false;S.ans=[];go("quiz");};
 
 function finishSession(){
   const scoreN=S.ans.filter(a=>a.correct).length;
   const xpGained=scoreN*10+(scoreN/S.qs.length>=0.8?50:0);
-  const today=new Date().toDateString();
-  const yest=new Date(Date.now()-86400000).toDateString();
+  const today=new Date().toDateString();const yest=new Date(Date.now()-86400000).toDateString();
   const newStreak=D.lastDate===today?D.streak:D.lastDate===yest?D.streak+1:1;
-  const sub=S.sub;
-  const newSubs={...D.subs};
-  const sd={...(newSubs[sub.id]||{seenIds:[],themeStats:{}})};
+  const sub=S.sub;const newSubs={...D.subs};const sd={...(newSubs[sub.id]||{seenIds:[],themeStats:{}})};
   const newSeen=[...new Set([...sd.seenIds,...S.qs.map(q=>q.id)])];
   const allIds=sub.questions.filter(q=>S.cfg.themes.includes(q.t)).map(q=>q.id);
   sd.seenIds=allIds.every(id=>newSeen.includes(id))?[]:newSeen;
@@ -370,163 +818,200 @@ function finishSession(){
   D={...D,xp:D.xp+xpGained,streak:newStreak,lastDate:today,totalSessions:D.totalSessions+1,sessions:newSessions,subs:newSubs};
   const earnedIds=BADGES.filter(b=>!D.badges.includes(b.id)&&b.check(D,newSessions)).map(b=>b.id);
   D.badges=[...D.badges,...earnedIds];
-  S.newBadges=BADGES.filter(b=>earnedIds.includes(b.id));
-  S.earned=xpGained;
-  saveData();
-  go("results");
+  S.newBadges=BADGES.filter(b=>earnedIds.includes(b.id));S.earned=xpGained;
+  saveData();go("results");
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // RENDERS
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
+
 function renderHub(){
+  
   const lv=getLv(D.xp),nl=getNextLv(D.xp);
   const xpPct=nl?Math.round((D.xp-lv.min)/(nl.min-lv.min)*100):100;
   const totalS=D.sessions.length;
-  const avgS=totalS>0?avg(D.sessions.map(s=>Math.round(s.score/s.total*100))):null;
+  const avgS=totalS>0?Math.round(D.sessions.reduce((s,r)=>s+(r.score/r.total)*100,0)/totalS):null;
   const weak=getWeakTheme();
 
-  const statsHtml=D.totalSessions>0?`
-    <div class="stats-row pad" style="margin-bottom:16px">
-      ${[["📅","Sessions",D.totalSessions],["🎯","Moyenne",avgS!=null?avgS+"%":"—"],["🔥","Série",D.streak>0?D.streak+"j":"0"]].map(([i,l,v])=>`
-        <div class="stat-box"><div style="font-size:18px">${i}</div><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>
-      `).join("")}
+  
+
+  const statsRow=D.totalSessions>0?`<div style="display:flex;gap:10px;margin-bottom:20px">
+    ${[["📅","Sessions",D.totalSessions],["🎯","Moyenne",avgS!=null?avgS+"%":"—"],["🔥","Série",D.streak>0?D.streak+"j":"0"]].map(([ic,lb,vl])=>`
+      <div class="stat-card"><div style="font-size:20px">${ic}</div><div class="stat-val">${vl}</div><div class="stat-lbl">${lb}</div></div>`).join("")}
+  </div>`:"";
+
+  const progressSection=Object.keys(D.subs).some(k=>Object.keys(D.subs[k].themeStats||{}).length>0)?`
+    <div style="margin-bottom:24px">
+      <p class="label" style="margin-bottom:12px">Progression par thème</p>
+      <div class="card" style="padding:16px">
+        ${SUBJECTS.map(sub=>{
+          const sd=D.subs[sub.id]||{seenIds:[],themeStats:{}};
+          return sub.themes.filter(t=>sd.themeStats[t.label]).map(t=>{
+            const ts=sd.themeStats[t.label],p=pct(ts.correct,ts.total);
+            return`<div style="margin-bottom:14px;last-of-type:margin-bottom:0">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:13px;font-weight:500;color:var(--t1)">${t.emoji} ${h(t.label)}</span>
+                <span style="font-size:12px;font-weight:700;color:${scoreColor(p)}">${p}% <span style="color:var(--ts);font-weight:400">(${ts.total} rép.)</span></span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:${p}%;background:${t.color}"></div></div>
+            </div>`;
+          }).join("");
+        }).join("")}
+      </div>
     </div>`:"";
 
-  const progressHtml=Object.keys(D.subs).some(k=>Object.keys(D.subs[k].themeStats||{}).length>0)?`
-    <div class="pad" style="margin-bottom:16px">
-      <div class="section-label">Progression</div>
-      ${SUBJECTS.map(sub=>{
-        const sd=D.subs[sub.id]||{seenIds:[],themeStats:{}};
-        return sub.themes.filter(t=>sd.themeStats[t.label]).map(t=>{
-          const ts=sd.themeStats[t.label],p=pct(ts.correct,ts.total);
-          return`<div style="margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:13px;color:#C5C0D8">${t.emoji} ${h(t.label)}</span>
-              <span style="font-size:13px;font-weight:700;color:${p>=70?"#2D9B6E":p>=50?"#E97F3A":"#E0344A"}">${p}% <span style="color:#4A4A6A;font-weight:400">(${ts.total})</span></span>
-            </div>
-            <div class="progress-wrap"><div class="progress-fill" style="width:${p}%;background:${p>=70?"#2D9B6E":p>=50?"#E97F3A":"#E0344A"}"></div></div>
-          </div>`;
-        }).join("");
-      }).join("")}
-    </div>`:"";;
-
-  const weakHtml=weak?`
-    <div class="pad" style="margin-bottom:12px">
-      <button onclick="quickWeakPoint()" style="width:100%;background:#1E1010;border:1px solid #E0344A33;border-radius:14px;padding:14px 16px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-size:11px;color:#E0344A;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">⚠️ Point faible</div>
-        <div style="font-size:14px;color:#F0EDE8;font-family:'DM Sans',sans-serif">S'entraîner : <strong>${h(weak.label)}</strong></div>
-        <div style="font-size:12px;color:#6B6B8A;font-family:'DM Sans',sans-serif">Score actuel : ${weak.pct}%</div></div>
-        <span style="font-size:20px;color:#E0344A">→</span>
-      </button>
-    </div>`:"";
-
-  const subCardsHtml=SUBJECTS.map(sub=>{
-    const ss=D.sessions.filter(s=>s.sub===sub.id);
-    const a=ss.length>0?avg(ss.map(s=>Math.round(s.score/s.total*100))):null;
-    return`<button onclick="openSubject('${sub.id}')" class="sub-card" style="border-left-color:${sub.color};margin-bottom:10px;width:100%;text-align:left">
+  const weakBanner=weak?`<div style="margin-bottom:20px">
+    <button onclick="quickWeakPoint()" style="width:100%;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:18px;padding:16px 18px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px">
       <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-          <span style="font-size:26px">${sub.emoji}</span>
-          <div><div style="font-size:15px;font-weight:700;color:#F0EDE8;font-family:'DM Sans',sans-serif">${h(sub.title)}</div><div style="font-size:12px;color:#555570">${h(sub.sub)}</div></div>
+        <div style="font-size:11px;font-weight:700;color:#EF4444;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">⚠️ Point faible identifié</div>
+        <div style="font-size:14px;font-weight:600;color:var(--t1)">S'entraîner : <strong>${h(weak.label)}</strong></div>
+        <div style="font-size:12px;color:var(--tm);margin-top:2px">Score actuel : ${weak.pct}% · Session ciblée générée automatiquement</div>
+      </div>
+      <span style="font-size:22px;flex-shrink:0">→</span>
+    </button>
+  </div>`:"";
+
+  const subCards=SUBJECTS.map(sub=>{
+    const ss=D.sessions.filter(s=>s.sub===sub.id);
+    const a=ss.length>0?Math.round(ss.reduce((x,s)=>x+s.score/s.total*100,0)/ss.length):null;
+    return`<button onclick="openSubject('${sub.id}')" class="sub-card" style="border-left-color:${sub.color};margin-bottom:12px">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="width:46px;height:46px;border-radius:14px;background:${sub.color}20;border:1px solid ${sub.color}40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${sub.emoji}</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--t1)">${h(sub.title)}</div>
+            <div style="font-size:12px;color:var(--tm);margin-top:1px">${h(sub.sub)}</div>
+          </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <span style="font-size:11px;color:${sub.color};background:${sub.color}22;border-radius:10px;padding:2px 8px">${sub.questions.length} questions</span>
-          ${ss.length>0?`<span style="font-size:11px;color:#555570;background:#222230;border-radius:10px;padding:2px 8px">${ss.length} sessions</span>`:""}
-          ${a!=null?`<span style="font-size:11px;font-weight:700;color:${a>=70?"#2D9B6E":a>=50?"#E97F3A":"#E0344A"};background:#222230;border-radius:10px;padding:2px 8px">${a}% moy.</span>`:""}
+          <span style="font-size:11px;font-weight:600;color:${sub.color};background:${sub.color}18;border:1px solid ${sub.color}30;border-radius:8px;padding:3px 9px">${sub.questions.length} questions</span>
+          ${ss.length>0?`<span style="font-size:11px;color:var(--tm);background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:3px 9px">${ss.length} sessions</span>`:""}
+          ${a!=null?`<span style="font-size:11px;font-weight:700;color:${scoreColor(a)};background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:3px 9px">${a}% moy.</span>`:""}
         </div>
       </div>
-      <span style="font-size:20px;color:${sub.color};margin-left:8px;flex-shrink:0">→</span>
+      <div style="font-size:20px;color:${sub.color};margin-left:8px;flex-shrink:0">→</div>
     </button>`;
   }).join("");
 
-  const badgesHtml=D.badges.length>0?`
-    <div class="pad" style="padding-bottom:8px">
-      <div class="section-label">Badges</div>
-      <div>${BADGES.filter(b=>D.badges.includes(b.id)).map(b=>`<span class="badge-pill">${b.emoji} ${h(b.label)}</span>`).join("")}</div>
-    </div>`:"";
+  const badgesSection=D.badges.length>0?`<div style="margin-top:20px">
+    <p class="label" style="margin-bottom:12px">Badges obtenus</p>
+    <div style="display:flex;flex-wrap:wrap;gap:0">${BADGES.filter(b=>D.badges.includes(b.id)).map(b=>`<span class="badge-item">${b.emoji} ${h(b.label)}</span>`).join("")}</div>
+  </div>`:"";
 
-  return`<div class="screen">
-    <div class="pad" style="padding-top:calc(32px + env(safe-area-inset-top,0px));padding-bottom:16px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+  return`<div class="screen relative">
+    <!-- Header -->
+    <div style="padding:calc(32px + var(--safe-top)) 20px 20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
         <div>
-          <div style="font-size:10px;letter-spacing:4px;color:#555570;text-transform:uppercase;margin-bottom:4px">Entraîneur</div>
-          <h1 class="hero">${lv.emoji} ${lv.label}</h1>
+          <p style="font-size:11px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;font-weight:600;margin-bottom:6px">Entraîneur Partiel</p>
+          <div style="font-size:28px;font-weight:800;color:var(--t1);line-height:1.1">${lv.emoji} ${lv.label}</div>
+          <div style="font-size:12px;color:var(--tm);margin-top:4px">${D.xp} XP${D.streak>0?" · 🔥 "+D.streak+" jour"+(D.streak>1?"s":""):""}</div>
         </div>
-        <div style="text-align:right">
-          <div style="font-size:22px;font-weight:800;color:#C9A84C">${D.xp} XP</div>
-          ${D.streak>0?`<div style="font-size:12px;color:#E97F3A;margin-top:2px">🔥 ${D.streak} jour${D.streak>1?"s":""}</div>`:""}
+        
+      </div>
+      <!-- XP bar -->
+      <div class="card-xs" style="padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:600;color:var(--t2)">${lv.label}</span>
+          ${nl?`<span style="font-size:11px;color:var(--tm)">${nl.min-D.xp} XP → ${nl.label} ${nl.emoji}</span>`:"<span style='font-size:11px;color:var(--tm)'>Niveau max 🏆</span>"}
+        </div>
+        <div class="xp-track"><div class="xp-fill" style="width:${xpPct}%"></div></div>
+      </div>
+    </div>
+
+    <div class="pad">
+      ${statsRow}
+      ${progressSection}
+      ${weakBanner}
+
+      <!-- Subjects -->
+      <p class="label" style="margin-bottom:12px">Matières</p>
+      ${subCards}
+      <!-- Coming soon -->
+      <div style="background:var(--surf2);border:1px dashed var(--border);border-radius:18px;padding:18px 20px;opacity:.5;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:44px;height:44px;border-radius:14px;background:var(--surf);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px">➕</div>
+          <div><div style="font-size:14px;font-weight:600;color:var(--tm)">Bientôt : Droit des contrats</div><div style="font-size:12px;color:var(--ts)">Nouvelle matière en cours de préparation…</div></div>
         </div>
       </div>
-      <div class="xp-wrap"><div class="xp-fill" style="width:${xpPct}%"></div></div>
-      ${nl?`<div style="font-size:11px;color:#555570;margin-top:4px">${lv.label} → ${nl.label} · ${nl.min-D.xp} XP restants</div>`:""}
+
+      ${badgesSection}
+
+      ${D.totalSessions>0?`<div style="padding:20px 0 8px;text-align:center"><button onclick="resetStats()" style="font-size:12px;color:var(--ts);background:none;border:none;cursor:pointer;font-family:var(--font);text-decoration:underline">Réinitialiser les statistiques</button></div>`:""}
     </div>
-    ${statsHtml}
-    ${progressHtml}
-    ${weakHtml}
-    <div class="pad" style="margin-bottom:8px">
-      <div class="section-label">Matières</div>
-      ${subCardsHtml}
-      <div class="soon-card"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">➕</span><div><div style="font-size:14px;font-weight:600;color:#555570;font-family:'DM Sans',sans-serif">Bientôt : Droit des contrats</div><div style="font-size:12px;color:#444455">Nouvelle matière à venir…</div></div></div></div>
-    </div>
-    ${badgesHtml}
-    ${D.totalSessions>0?`<div class="pad" style="padding-bottom:40px"><button onclick="resetStats()" style="background:transparent;border:none;color:#333345;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline">Réinitialiser les statistiques</button></div>`:"<div style='padding-bottom:40px'></div>"}
+    <div style="height:32px"></div>
   </div>`;
 }
 
 function renderSubject(){
-  const sub=S.sub;
-  const sd=D.subs[sub.id]||{seenIds:[],themeStats:{}};
+  const sub=S.sub;const sd=D.subs[sub.id]||{seenIds:[],themeStats:{}};
   const ss=D.sessions.filter(s=>s.sub===sub.id);
-  const a=ss.length>0?avg(ss.map(s=>Math.round(s.score/s.total*100))):null;
+  const a=ss.length>0?Math.round(ss.reduce((x,s)=>x+s.score/s.total*100,0)/ss.length):null;
   const best=ss.length>0?Math.max(...ss.map(s=>Math.round(s.score/s.total*100))):null;
 
-  const statsHtml=ss.length>0?`<div class="stats-row" style="margin-bottom:20px">${[["Sessions",ss.length],["Moyenne",a+"%"],["Meilleur",best+"%"]].map(([l,v])=>`<div class="stat-box"><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`).join("")}</div>`:"";
+  const statsRow=ss.length>0?`<div style="display:flex;gap:10px;margin-bottom:24px">
+    ${[["Sessions",ss.length],["Moy.",a+"%"],["Meilleur",best+"%"]].map(([l,v])=>`<div class="stat-card"><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`).join("")}
+  </div>`:"";
 
-  const themeProgressHtml=Object.keys(sd.themeStats).length>0?`
-    <div style="margin-bottom:20px">
-      <div class="section-label">Par thème</div>
-      ${sub.themes.filter(t=>sd.themeStats[t.label]).map(t=>{const ts=sd.themeStats[t.label],p=pct(ts.correct,ts.total);return`
-        <div style="margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:13px;color:#C5C0D8">${t.emoji} ${h(t.label)}</span>
-            <span style="font-size:13px;font-weight:700;color:${p>=70?"#2D9B6E":p>=50?"#E97F3A":"#E0344A"}">${p}% (${ts.total})</span>
+  const themeProgress=Object.keys(sd.themeStats).length>0?`<div style="margin-bottom:24px">
+    <p class="label" style="margin-bottom:10px">Progression par thème</p>
+    <div class="card" style="padding:14px 16px">
+      ${sub.themes.filter(t=>sd.themeStats[t.label]).map(t=>{const ts=sd.themeStats[t.label];const p=pct(ts.correct,ts.total);return`
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:13px;color:var(--t1)">${t.emoji} ${h(t.label)}</span>
+            <span style="font-size:12px;font-weight:700;color:${scoreColor(p)}">${p}% (${ts.total})</span>
           </div>
-          <div class="progress-wrap"><div class="progress-fill" style="width:${p}%;background:${p>=70?"#2D9B6E":p>=50?"#E97F3A":"#E0344A"}"></div></div>
+          <div class="progress-track"><div class="progress-fill" style="width:${p}%;background:${t.color}"></div></div>
         </div>`;}).join("")}
-    </div>`:"";
+    </div>
+  </div>`:"";
 
-  const themeToggles=sub.themes.map(t=>{const on=S.cfg.themes.includes(t.id);return`<button onclick="toggleTheme('${t.id}')" class="theme-toggle" style="background:${on?t.color+"18":"#13131A"};border-color:${on?t.color:"#333345"};color:${on?t.color:"#555570"}">
-    <span>${t.emoji} ${h(t.label)}</span><span>${on?"✓":"○"}</span></button>`;}).join("");
+  const themeToggles=sub.themes.map(t=>{const on=S.cfg.themes.includes(t.id);return`
+    <button onclick="toggleTheme('${t.id}')" class="theme-chip" style="border-color:${on?t.color:"var(--border)"};background:${on?t.color+"15":"var(--surf)"};color:${on?t.color:"var(--tm)"}">
+      <span style="font-weight:600">${t.emoji} ${h(t.label)}</span>
+      <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${on?t.color:"var(--border)"};background:${on?t.color:"transparent"};display:flex;align-items:center;justify-content:center;font-size:11px;color:white;flex-shrink:0">${on?"✓":""}</div>
+    </button>`;}).join("");
 
-  const diffBtns=[{id:"f",l:"Facile",s:"Définitions"},{id:"m",l:"Moyen",s:"Application"},{id:"h",l:"Difficile",s:"Cas pratiques"},{id:"x",l:"Mixte",s:"Tous niveaux"}].map(d=>`
-    <button onclick="setDiff('${d.id}')" class="diff-btn" style="border-color:${S.cfg.diff===d.id?DIFF_C[d.id]:"#333345"}">
-      <div class="diff-btn-label" style="color:${S.cfg.diff===d.id?DIFF_C[d.id]:"#555570"}">${d.l}</div>
-      <div class="diff-btn-sub">${d.s}</div>
+  const diffBtns=[{id:"f",l:"Facile",s:"Définitions & notions"},{id:"m",l:"Moyen",s:"Application & calculs"},{id:"h",l:"Difficile",s:"Cas pratiques & pièges"},{id:"x",l:"Mixte",s:"Tous niveaux mélangés"}].map(d=>`
+    <button onclick="setDiff('${d.id}')" class="diff-chip" style="border-color:${S.cfg.diff===d.id?DC[d.id]:"var(--border)"};background:${S.cfg.diff===d.id?DC[d.id]+"12":"var(--surf)"}">
+      <div class="diff-chip-label" style="color:${S.cfg.diff===d.id?DC[d.id]:"var(--t1)"}">${d.l}</div>
+      <div class="diff-chip-sub">${d.s}</div>
     </button>`).join("");
 
-  const countBtns=[5,7,10,15].map(n=>`<button onclick="setCount(${n})" class="count-btn" style="background:${S.cfg.count===n?sub.color:"#13131A"};border-color:${S.cfg.count===n?sub.color:"#333345"};color:${S.cfg.count===n?"#0D0D12":"#555570"}">${n}</button>`).join("");
+  const countBtns=[5,7,10,15].map(n=>`
+    <button onclick="setCount(${n})" class="count-chip" style="border-color:${S.cfg.count===n?sub.color:"var(--border)"};background:${S.cfg.count===n?"linear-gradient(135deg,"+sub.gfrom+","+sub.gto+")":"var(--surf)"};color:${S.cfg.count===n?"white":"var(--tm)"}">${n}</button>`).join("");
 
-  return`<div class="screen">
-    <div style="background:${sub.bg};padding:calc(20px + env(safe-area-inset-top,0px)) 20px 20px;border-bottom:1px solid #222230">
-      <button onclick="goHub()" class="btn-ghost" style="margin-bottom:14px;display:block">← Retour</button>
-      <div style="display:flex;align-items:center;gap:12px">
-        <span style="font-size:36px">${sub.emoji}</span>
-        <div><h2 class="hero" style="font-size:20px">${h(sub.title)}</h2><div style="font-size:13px;color:#888;margin-top:2px">${h(sub.sub)} · ${sub.questions.length} questions</div></div>
+  return`<div class="screen relative">
+    <!-- Hero header -->
+    <div style="background:var(--surf2);border-bottom:1px solid var(--border);padding:calc(20px + var(--safe-top)) 20px 24px">
+      <button onclick="goHub()" class="btn-back" style="margin-bottom:16px;display:inline-flex">‹ Retour</button>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,${sub.gfrom},${sub.gto});display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 20px ${sub.color}40">${sub.emoji}</div>
+        <div>
+          <h2 style="font-size:22px;font-weight:800;color:var(--t1)">${h(sub.title)}</h2>
+          <p style="font-size:13px;color:var(--tm);margin-top:2px">${h(sub.sub)} · ${sub.questions.length} questions</p>
+        </div>
       </div>
     </div>
-    <div style="padding:20px">
-      ${statsHtml}
-      ${themeProgressHtml}
-      <div class="card" style="padding:16px;margin-bottom:16px">
-        <div class="section-label">Thèmes</div>
-        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">${themeToggles}</div>
-        <div class="section-label">Difficulté</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">${diffBtns}</div>
-        <div class="section-label">Nombre de questions</div>
-        <div style="display:flex;gap:6px">${countBtns}</div>
+
+    <div class="pad" style="padding-top:20px">
+      ${statsRow}
+      ${themeProgress}
+
+      <div class="card" style="padding:18px;margin-bottom:20px">
+        <p class="label" style="margin-bottom:12px">Thèmes</p>
+        <div class="stack" style="margin-bottom:20px">${themeToggles}</div>
+
+        <p class="label" style="margin-bottom:10px">Difficulté</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">${diffBtns}</div>
+
+        <p class="label" style="margin-bottom:10px">Nombre de questions</p>
+        <div style="display:flex;gap:8px">${countBtns}</div>
       </div>
-      <button onclick="startSession()" class="btn" style="background:${sub.color};color:#0D0D12;box-shadow:0 4px 20px ${sub.color}40;margin-bottom:40px">
+
+      <button onclick="startSession()" class="btn-primary" style="margin-bottom:40px;background:linear-gradient(135deg,${sub.color},${sub.gto});">
         Commencer la session →
       </button>
     </div>
@@ -534,130 +1019,157 @@ function renderSubject(){
 }
 
 function renderQuiz(){
-  const sub=S.sub,q=S.qs[S.cur];
-  const tObj=sub.themes.find(t=>t.id===q.t)||sub.themes[0];
-  const prog=Math.round(S.cur/S.qs.length*100);
-  const correctCt=S.ans.filter(a=>a.correct).length;
+  const sub=S.sub;const q=S.qs[S.cur];const tObj=sub.themes.find(t=>t.id===q.t)||sub.themes[0];
+  const prog=Math.round((S.cur/S.qs.length)*100);const correctCt=S.ans.filter(a=>a.correct).length;
 
   const opts=q.o.map((opt,idx)=>{
-    let cls="option",iconStyle="",textColor="#C5C0D8",icon=["A","B","C","D"][idx];
+    let cls="option",iconContent=["A","B","C","D"][idx];
     if(S.rev){
-      if(idx===q.a){cls="option correct";icon="✓";iconStyle=`style="background:#2D9B6E;color:white"`;textColor="#6EE7B7";}
-      else if(idx===S.sel){cls="option wrong";icon="✗";iconStyle=`style="background:#E0344A;color:white"`;textColor="#FCA5A5";}
-      else{cls="option dimmed";}
-    } else if(S.sel===idx){cls=`option sel`;}
+      if(idx===q.a)cls="option correct";
+      else if(idx===S.sel)cls="option wrong";
+      else cls="option dimmed";
+    }else if(S.sel===idx)cls="option sel";
+    if(S.rev&&idx===q.a)iconContent="✓";
+    else if(S.rev&&idx===S.sel&&idx!==q.a)iconContent="✗";
     return`<button onclick="selectAnswer(${idx})" class="${cls}" ${S.rev&&idx!==q.a&&idx!==S.sel?"disabled":""}>
-      <span class="opt-icon" ${iconStyle}>${icon}</span>
-      <span class="opt-text" style="color:${textColor}">${h(opt)}</span>
+      <span class="opt-icon">${iconContent}</span>
+      <span class="opt-text">${h(opt)}</span>
     </button>`;
   }).join("");
 
-  const expl=S.rev?`<div class="expl ${S.sel===q.a?"expl-ok":"expl-bad"}">
-    <div class="expl-title" style="color:${S.sel===q.a?"#6EE7B7":"#C9A84C"}">${S.sel===q.a?"✅ Correct !":"💡 Explication"}</div>
+  const expl=S.rev?`<div class="expl ${S.sel===q.a?"ok":"bad"}">
+    <div class="expl-head">${S.sel===q.a?"✅ Bonne réponse !":"💡 Explication"}</div>
     <p>${h(q.e)}</p>
   </div>`:"";
 
-  const nextBtn=S.rev?`<button onclick="nextQuestion()" class="btn" style="background:${sub.color};color:#0D0D12;margin-top:14px">
-    ${S.cur+1<S.qs.length?"Suivant →":"Voir les résultats 🎯"}
+  const nextBtn=S.rev?`<button onclick="nextQuestion()" class="btn-primary" style="margin-top:16px;background:linear-gradient(135deg,${sub.color},${sub.gto})">
+    ${S.cur+1<S.qs.length?"Question suivante →":"Voir mes résultats 🎯"}
   </button>`:"";
 
   return`<div class="screen">
-    <div class="quiz-header">
-      <button onclick="goSubject()" class="btn-ghost">✕</button>
-      <span class="quiz-count">${S.cur+1} <span class="muted">/ ${S.qs.length}</span></span>
-      <span class="correct-ct">✓ ${correctCt}</span>
+    <!-- Sticky header -->
+    <div class="quiz-top">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <button onclick="goSubject()" style="font-size:14px;color:var(--ts);background:none;border:none;cursor:pointer;font-family:var(--font)">✕</button>
+        <span style="font-size:13px;font-weight:700;color:var(--t1)">${S.cur+1} <span style="color:var(--ts)">/ ${S.qs.length}</span></span>
+        <span style="font-size:13px;font-weight:700;color:#10B981">✓ ${correctCt}</span>
+      </div>
+      <div class="progress-track" style="border-radius:0;border:none;border-bottom:1px solid var(--border)">
+        <div class="progress-fill" style="width:${prog}%;background:${sub.color}"></div>
+      </div>
     </div>
-    <div class="progress-wrap" style="border-radius:0"><div class="progress-fill" style="width:${prog}%;background:${sub.color}"></div></div>
-    <div style="padding:16px 20px 32px">
-      <div style="display:flex;gap:6px;margin-bottom:14px">
-        <span class="theme-tag" style="background:${tObj.color}22;color:${tObj.color};border:1px solid ${tObj.color}30">${tObj.emoji} ${h(tObj.label)}</span>
-        <span class="diff-tag" style="background:${DIFF_C[q.d]}22;color:${DIFF_C[q.d]}">${DIFF_L[q.d]}</span>
+
+    <div class="pad" style="padding-top:18px;padding-bottom:32px">
+      <!-- Tags -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <span class="pill" style="background:${tObj.color}15;color:${tObj.color};border-color:${tObj.color}30">${tObj.emoji} ${h(tObj.label)}</span>
+        <span class="pill" style="background:${DC[q.d]}12;color:${DC[q.d]};border-color:${DC[q.d]}30">${DL[q.d]}</span>
       </div>
-      <div id="qcard" class="card" style="padding:20px;margin-bottom:14px;border-left:4px solid ${tObj.color}">
-        <p class="serif" style="font-size:15px;line-height:1.7;color:#F0EDE8;margin:0">${h(q.q)}</p>
+
+      <!-- Question card -->
+      <div id="qcard" class="card" style="padding:20px 22px;margin-bottom:16px;border-left:3px solid ${tObj.color}">
+        <p style="font-size:15px;font-weight:500;line-height:1.75;color:var(--t1);margin:0">${h(q.q)}</p>
       </div>
-      <div style="display:flex;flex-direction:column;gap:10px">${opts}</div>
+
+      <!-- Options -->
+      <div class="stack">${opts}</div>
       ${expl}
       ${nextBtn}
     </div>
   </div>`;
 }
 
+function drawScoreRing(p,color){
+  const size=140;const r=58;const c=document.getElementById("scoreCanvas");
+  if(!c)return;c.width=c.height=size;const ctx=c.getContext("2d");
+  // Track
+  ctx.beginPath();ctx.arc(size/2,size/2,r,0,Math.PI*2);ctx.strokeStyle="#222230";ctx.lineWidth=12;ctx.stroke();
+  // Fill
+  if(p>0){
+    const grad=ctx.createLinearGradient(0,0,size,size);grad.addColorStop(0,"#C9A84C");grad.addColorStop(1,"#E0B85C");
+    ctx.beginPath();ctx.arc(size/2,size/2,r,-Math.PI/2,(-Math.PI/2)+(2*Math.PI*p/100));
+    ctx.strokeStyle=grad;ctx.lineWidth=12;ctx.lineCap="round";ctx.stroke();
+  }
+}
+
 function renderResults(){
-  const sub=S.sub;
-  const scoreN=S.ans.filter(a=>a.correct).length;
-  const total=S.ans.length;
-  const p=pct(scoreN,total);
-  const grades=[{min:90,l:"Excellent",c:"#2D9B6E",e:"🏆"},{min:75,l:"Très bien",c:"#2B7EE0",e:"👍"},{min:60,l:"Bien",c:"#E97F3A",e:"📈"},{min:0,l:"À retravailler",c:"#E0344A",e:"💪"}];
+  const sub=S.sub;const scoreN=S.ans.filter(a=>a.correct).length;const total=S.ans.length;const p=pct(scoreN,total);
+  const grades=[{min:90,l:"Excellent",c:"#10B981",e:"🏆"},{min:75,l:"Très bien",c:"#6366F1",e:"👍"},{min:60,l:"Bien",c:"#F59E0B",e:"📈"},{min:0,l:"À retravailler",c:"#EF4444",e:"💪"}];
   const g=grades.find(x=>p>=x.min);
+  const byTheme=sub.themes.map(t=>{const qs=S.ans.filter(a=>a.theme===t.id);if(!qs.length)return null;const c=qs.filter(a=>a.correct).length;return{...t,c,total:qs.length,pct:pct(c,qs.length)};}).filter(Boolean);
 
-  const byTheme=sub.themes.map(t=>{
-    const qs=S.ans.filter(a=>a.theme===t.id);if(!qs.length)return null;
-    const c=qs.filter(a=>a.correct).length,p2=pct(c,qs.length);
-    return{...t,c,total:qs.length,pct:p2};
-  }).filter(Boolean);
+  const newBadgesHtml=S.newBadges.length>0?`<div class="card" style="padding:16px;margin-bottom:20px;border-color:${sub.color}40">
+    <p style="font-size:12px;font-weight:700;color:${sub.color};letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">🎉 Nouveau badge débloqué !</p>
+    ${S.newBadges.map(b=>`<div style="display:flex;align-items:center;gap:12px"><span style="font-size:28px">${b.emoji}</span><div><div style="font-size:14px;font-weight:700;color:var(--t1)">${h(b.label)}</div><div style="font-size:12px;color:var(--tm)">${h(b.desc)}</div></div></div>`).join("")}
+  </div>`:"";
 
-  const byThemeHtml=byTheme.length>1?`<div style="margin-bottom:20px">
-    <div class="section-label">Par thème</div>
-    ${byTheme.map(t=>`<div class="card-sm" style="padding:12px 16px;margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:13px;color:#C5C0D8">${t.emoji} ${h(t.label)}</span>
-        <span style="font-size:13px;font-weight:700;color:${t.pct>=70?"#2D9B6E":t.pct>=50?"#E97F3A":"#E0344A"}">${t.c}/${t.total}</span>
+  const byThemeHtml=byTheme.length>1?`<div style="margin-bottom:24px">
+    <p class="label" style="margin-bottom:12px">Résultats par thème</p>
+    ${byTheme.map(t=>`<div class="card-sm" style="padding:13px 16px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <span style="font-size:13px;color:var(--t1)">${t.emoji} ${h(t.label)}</span>
+        <span style="font-size:13px;font-weight:700;color:${scoreColor(t.pct)}">${t.c}/${t.total} (${t.pct}%)</span>
       </div>
-      <div class="progress-wrap"><div class="progress-fill" style="width:${t.pct}%;background:${t.pct>=70?"#2D9B6E":t.pct>=50?"#E97F3A":"#E0344A"}"></div></div>
+      <div class="progress-track"><div class="progress-fill" style="width:${t.pct}%;background:${t.color}"></div></div>
     </div>`).join("")}
   </div>`:"";
 
-  const newBadgesHtml=S.newBadges.length>0?`<div class="card" style="padding:16px;margin-bottom:16px;border-color:#C9A84C40">
-    <div style="font-size:12px;font-weight:700;color:#C9A84C;margin-bottom:10px">🎉 Nouveau badge !</div>
-    ${S.newBadges.map(b=>`<div style="display:flex;align-items:center;gap:10px"><span style="font-size:26px">${b.emoji}</span><div style="font-size:14px;font-weight:700;color:#F0EDE8;font-family:'DM Sans',sans-serif">${h(b.label)}</div></div>`).join("")}
-  </div>`:"";
-
   const histSess=D.sessions.filter(s=>s.sub===sub.id);
-  const histHtml=histSess.length>1?`<div style="margin-bottom:20px">
-    <div class="section-label">Historique</div>
-    <div class="hist-scroll">${histSess.slice(-8).reverse().map((s,i)=>{
-      const p2=Math.round(s.score/s.total*100);
-      return`<div class="hist-item ${i===0?"latest":""}" style="${i===0?`border-color:${sub.color}`:""}"}>
-        <div style="font-size:13px;font-weight:700;color:${p2>=70?"#2D9B6E":p2>=50?"#E97F3A":"#E0344A"}">${p2}%</div>
-        <div style="font-size:10px;color:#444455;margin-top:1px">${s.score}/${s.total}</div>
-      </div>`;
-    }).join("")}</div>
+  const histHtml=histSess.length>1?`<div style="margin-bottom:24px">
+    <p class="label" style="margin-bottom:12px">Historique</p>
+    <div class="hist-row">
+      ${histSess.slice(-8).reverse().map((s,i)=>{const p2=Math.round(s.score/s.total*100);return`<div class="hist-box ${i===0?"latest":""}">
+        <div style="font-size:13px;font-weight:800;color:${scoreColor(p2)}">${p2}%</div>
+        <div style="font-size:10px;color:var(--ts);margin-top:2px">${s.score}/${s.total}</div>
+      </div>`;}).join("")}
+    </div>
   </div>`:"";
 
-  return`<div class="screen">
-    <div style="background:${sub.bg};padding:40px 20px 28px;text-align:center">
-      <div style="font-size:52px;margin-bottom:8px">${g.e}</div>
-      <div class="result-pct">${p}%</div>
-      <div style="color:#555570;font-size:14px;margin-top:4px">${scoreN} / ${total} bonnes réponses</div>
-      <div class="result-grade" style="background:${g.c}">${g.l}</div>
-      <div class="xp-earned">✨ +${S.earned} XP</div>
+  setTimeout(()=>drawScoreRing(p,g.c,isDark),50);
+
+  return`<div class="screen relative">
+    <!-- Hero -->
+    <div style="padding:40px 20px 28px;text-align:center;border-bottom:1px solid var(--border)">
+      <div class="score-ring">
+        <canvas id="scoreCanvas"></canvas>
+        <div class="score-inner">
+          <div class="score-pct" style="color:var(--t1)">${p}%</div>
+          <div class="score-lbl">${scoreN}/${total}</div>
+        </div>
+      </div>
+      <div style="display:inline-block;background:${g.c};color:white;border-radius:20px;padding:6px 20px;font-size:14px;font-weight:700;margin-bottom:14px">${g.e} ${g.l}</div>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(79,70,229,.1);border:1px solid rgba(79,70,229,.25);border-radius:14px;padding:10px 18px;font-size:15px;font-weight:700;color:#818CF8">✨ +${S.earned} XP gagnés</div>
     </div>
-    <div style="padding:20px">
+
+    <div class="pad" style="padding-top:24px">
       ${newBadgesHtml}
       ${byThemeHtml}
       ${histHtml}
-      <div style="display:flex;flex-direction:column;gap:10px;padding-bottom:40px">
-        <button onclick="startSession()" class="btn" style="background:${sub.color};color:#0D0D12">🔄 Nouvelle session</button>
+
+      <div class="stack" style="padding-bottom:40px">
+        <button onclick="startSession()" class="btn-primary" style="background:linear-gradient(135deg,${sub.color},${sub.gto})">🔄 Nouvelle session</button>
         <button onclick="goSubject()" class="btn-soft">Changer les réglages</button>
-        <button onclick="goHub()" class="btn-dim">Accueil</button>
+        <button onclick="goHub()" class="btn-ghost">Accueil</button>
       </div>
     </div>
   </div>`;
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // MAIN RENDER
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
 function render(){
   const app=document.getElementById("app");
-  const screens={hub:renderHub,subject:renderSubject,quiz:renderQuiz,results:renderResults};
-  app.innerHTML=(screens[S.screen]||renderHub)();
+  const map={hub:renderHub,subject:renderSubject,quiz:renderQuiz,results:renderResults};
+  app.innerHTML=(map[S.screen]||renderHub)();
   app.scrollTop=0;
 }
 
 // INIT
+initTheme();
+initFavicon();
 render();
 </script>
+
 </body>
 </html>
