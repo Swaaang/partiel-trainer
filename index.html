@@ -254,6 +254,16 @@ align-items:center;gap:12px;cursor:pointer;text-align:left;
 <body>
 <div id="root"><div id="app"><div style="color:white;padding:40px;font-family:sans-serif;background:#0D0D12;min-height:100vh"><h2>⏳ Chargement...</h2><p style="color:#888;margin-top:8px">Si ce message persiste, rechargez la page.</p></div></div></div>
 <script>
+window.onerror=function(msg,src,line,col,err){
+  var d=document.getElementById('app');
+  if(d)d.innerHTML='<div style="color:#fff;padding:24px;background:#1a0000;min-height:100vh;font-family:monospace">'
+    +'<h2 style="color:#ff4444">❌ Erreur JS (line '+line+')</h2>'
+    +'<p style="color:#ffaaaa;margin-top:12px;font-size:13px;word-break:break-all">'+msg+'</p>'
+    +'<p style="color:#ff8888;margin-top:8px;font-size:11px">'+(err&&err.stack||'')+'</p></div>';
+  return true;
+};
+</script>
+<script>
 // ── QUESTIONS ────────────────────────────────────────────────────
 const ENT_Q=[
   // ENTREPRISE INDIVIDUELLE
