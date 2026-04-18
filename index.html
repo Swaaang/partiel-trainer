@@ -1038,6 +1038,10 @@ function renderQuiz(){
     <p>${h(q.e)}</p>
   </div>`:"";
 
+  const validateBtn=(!S.rev && S.sel!==null)?`<button onclick="validateAnswer()" class="btn-primary" style="margin-top:16px">
+    Valider ma réponse ✓
+  </button>`:"";
+
   const nextBtn=S.rev?`<button onclick="nextQuestion()" class="btn-primary" style="margin-top:16px;background:linear-gradient(135deg,${sub.color},${sub.gto})">
     ${S.cur+1<S.qs.length?"Question suivante →":"Voir mes résultats 🎯"}
   </button>`:"";
