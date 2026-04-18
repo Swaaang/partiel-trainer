@@ -1329,7 +1329,16 @@ el.innerHTML=(screens[Q.screen]||renderHub)();
 
 // ── INIT ──────────────────────────────────────────────────────────
 try{buildFavicon();}catch(e){}
+try{
 render();
+}catch(e){
+document.getElementById(‘app’).innerHTML=
+‘<div style="color:#fff;padding:30px;font-family:monospace;background:#1a0000;min-height:100vh">’+
+‘<h2 style="color:#ff4444;margin-bottom:16px">❌ Erreur JS</h2>’+
+‘<p style="color:#ffaaaa;font-size:13px;word-break:break-all">’+e.message+’</p>’+
+‘<pre style="color:#ff8888;font-size:11px;margin-top:12px;white-space:pre-wrap">’+
+(e.stack||‘no stack’)+’</pre></div>’;
+}
 </script>
 
 </body>
