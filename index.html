@@ -778,7 +778,12 @@ function go(screen){const app=document.getElementById("app");app.classList.add("
 // ═══════════════════════════════════════════════
 window.openSubject=function(id){S.sub=SUBJECTS.find(s=>s.id===id);S.cfg={themes:S.sub.themes.map(t=>t.id),diff:"m",count:7};go("subject");};
 window.startSession=function(){S.qs=selectQ(S.sub,S.cfg);S.cur=0;S.sel=null;S.rev=false;S.ans=[];go("quiz");};
-window.selectAnswer=function(idx){if(S.rev)return;S.sel=idx;S.rev=true;render();};
+window.validateAnswer=function(){
+  if(S.sel===null||S.rev)return;
+  S.rev=true;
+  render();
+};
+window.selectAnswer=function(idx){if(S.rev)return;S.sel=idx;render();};
 window.nextQuestion=function(){
   const q=S.qs[S.cur];const ok=S.sel===q.a;S.ans.push({theme:q.t,qid:q.id,correct:ok});
   if(S.cur+1<S.qs.length){const qc=document.getElementById("qcard");if(qc){qc.style.transition="opacity .15s,transform .15s";qc.style.opacity="0";qc.style.transform="translateX(14px)";}setTimeout(()=>{S.cur++;S.sel=null;S.rev=false;render();},170);}
@@ -1016,13 +1021,13 @@ function renderQuiz(){
   const opts=q.o.map((opt,idx)=>{
     let cls="option",iconContent=["A","B","C","D"][idx];
     if(S.rev){
-      if(idx===q.a)cls="option correct";
-      else if(idx===S.sel)cls="option wrong";
-      else cls="option dimmed";
-    }else if(S.sel===idx)cls="option sel";
+      if(idx===q.a)  cls="option correct";
+      else if(idx===S.sel) cls="option wrong";
+      else           cls="option dimmed";
+    } else if(S.sel===idx) cls="option sel";
     if(S.rev&&idx===q.a)iconContent="✓";
     else if(S.rev&&idx===S.sel&&idx!==q.a)iconContent="✗";
-    return`<button onclick="selectAnswer(${idx})" class="${cls}" ${S.rev&&idx!==q.a&&idx!==S.sel?"disabled":""}>
+    return`<button onclick="selectAnswer(${idx})" class="${cls}" ${S.rev?"disabled":""}>
       <span class="opt-icon">${iconContent}</span>
       <span class="opt-text">${h(opt)}</span>
     </button>`;
@@ -1065,6 +1070,7 @@ function renderQuiz(){
       <!-- Options -->
       <div class="stack">${opts}</div>
       ${expl}
+      ${validateBtn}
       ${nextBtn}
     </div>
   </div>`;
